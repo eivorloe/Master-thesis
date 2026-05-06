@@ -1,0 +1,375 @@
+%equations, bib. \\
+
+\section{Statistical Framework}
+
+This section introduces the statistical frameworks used to study how genetic and environmental factors contribute to biologically important traits. The aim is to establish the modelling tools needed to describe, analyze, and predict trait variation in a quantitative genetic setting. We begin with the basic linear model and then extend the discussion to generalized linear mixed models, which are better suited to the types of traits and data structures considered in this thesis. Throughout, the focus is on prediction, with emphasis on how the different models represent biological variation and how their assumptions affect what can be inferred and predicted.   
+
+\subsection{Linear Models}
+
+The linear model serves as the simplest statistical framework for relating a response variable to a set of explanatory variables, and the model classes introduced later in this section can be understood as extensions of this framework. In its basic form, a linear model describes the response as a linear combination of covariates, an intercept, and an error term. Linear regression can be written as
+%
+\begin{equation}
+y = \beta_0 + \sum_{i=1}^p \beta_i x_i + \varepsilon,
+\end{equation}
+%
+where $y$ is the response, $x_i$ denotes covariate $i$, $p$ is the number of covariates, $\beta_0$ is the intercept, $\beta_i$ is the effect of covariate $i$, and $\varepsilon$ is the error term.
+
+For $N$ responses, the same model can be written more compactly in matrix form,
+%
+\begin{equation}
+\mathbf{y} = \mathbf{X}\boldsymbol{\beta} + \boldsymbol{\varepsilon},
+\end{equation}
+%
+where
+\[
+\mathbf{y} =
+\begin{bmatrix}
+y_1 \\
+y_2 \\
+\vdots \\
+y_N
+\end{bmatrix},
+\qquad
+\boldsymbol{\beta} =
+\begin{bmatrix}
+\beta_0 \\
+\beta_1 \\
+\vdots \\
+\beta_p
+\end{bmatrix},
+\qquad
+\boldsymbol{\varepsilon} =
+\begin{bmatrix}
+\varepsilon_1 \\
+\varepsilon_2 \\
+\vdots \\
+\varepsilon_N
+\end{bmatrix},
+\]
+and
+\[
+\mathbf{X} =
+\begin{bmatrix}
+1 & x_{11} & x_{12} & \cdots & x_{1p} \\
+1 & x_{21} & x_{22} & \cdots & x_{2p} \\
+\vdots & \vdots & \vdots & \ddots & \vdots \\
+1 & x_{N1} & x_{N2} & \cdots & x_{Np}
+\end{bmatrix}.
+\]
+\\
+
+A standard assumption in linear regression is that the response is continuous and that the error term is independent and identically distributed according to a normal distribution with mean zero and constant variance, that is,
+%
+\begin{equation}
+\boldsymbol{\varepsilon} \sim N(\boldsymbol{0},\sigma^2)\boldsymbol{I} \ ,
+\end{equation}
+%
+where $\boldsymbol{I}$ is the $N\times N$ identity matrix.
+These assumptions make the model simple and interpretable, but they also limit the types of responses and dependence structures that can be represented directly.
+
+Under these assumptions, the conditional mean of the response is a linear function of the covariates,
+%
+\begin{equation}
+\mathbb{E}(\mathbf{y}\mid\mathbf{X}) = \mathbf{X}\boldsymbol{\beta} \ .
+\end{equation}
+
+
+
+\subsection{Linear Mixed Models}
+
+A limitation of the linear model is that all unexplained variation is represented through a single error term. In many applications, however, observations are grouped or otherwise dependent, so that part of the variation is associated with a particular clustering structure rather than with independent residual noise alone. Linear mixed models extend the linear model by including random effects in addition to fixed effects, allowing such structured variation to be represented explicitly.
+
+In a simple random-intercept formulation, the response for observation $j$ in group $i$ can be written as
+%
+\begin{equation}
+y_{ij} = \beta_0 + \beta_1 x_{ij} + d_i + \varepsilon_{ij},
+\end{equation}
+%
+where $\beta_0$ and $\beta_1$ are fixed-effect coefficients, $d_i$ is a random effect associated with group $i$, and $\varepsilon_{ij}$ is the residual error term. The fixed effects describe relationships that are assumed to be common across all observations, while the random effects capture variation associated with the grouping structure.
+
+More generally, a linear mixed model can be written in matrix form as
+%
+\begin{equation}
+\mathbf{y} = \mathbf{X}\boldsymbol{\beta} + \mathbf{W}\mathbf{d} + \boldsymbol{\varepsilon},
+\end{equation}
+%
+where $\mathbf{X}\boldsymbol{\beta}$ represents the fixed-effects part of the model, $\mathbf{W}\mathbf{d}$ represents the random-effects part, and $\boldsymbol{\varepsilon}$ is the residual term. Here, $\mathbf{W}$ is the design matrix for the random effects, and $\mathbf{d}$ is the corresponding vector of random-effect coefficients.
+
+As in the linear model, the response is typically assumed to be continuous. A common formulation assumes
+%
+\begin{equation}
+\begin{pmatrix}
+\mathbf{d} \\
+\boldsymbol{\varepsilon}
+\end{pmatrix}
+\sim
+N\left(
+\begin{pmatrix}
+\mathbf{0} \\
+\mathbf{0}
+\end{pmatrix},
+\begin{pmatrix}
+\mathbf{G} & \mathbf{0} \\
+\mathbf{0} & \mathbf{R}
+\end{pmatrix}
+\right),
+\end{equation}
+%
+where $\mathbf{G}$ and $\mathbf{R}$ denote the covariance structures of the random effects and residual errors. The random effects then capture structured variation, while the residual term captures remaining unexplained variation. Linear mixed models therefore extend the linear model by allowing dependence between observations through random effects.
+
+\subsection{Generalized Linear Mixed Models}
+
+Linear mixed models allow grouped or correlated observations to be represented through random effects, but they still rely on the assumption that the response is continuous and approximately Gaussian. Generalized linear models relax the Gaussian response assumption, but do not by themselves account for dependence between observations. Generalized linear mixed models (GLMMs) combine these two extensions in a single framework. This makes it possible to model non-Gaussian responses while simultaneously representing structured sources of variation through random effects.
+
+Let $\mathbf{d}$ denote the vector of random effects and let $\mathbf{W}$ be the corresponding design matrix. In a GLMM, the response is modelled conditionally on the random effects, so that
+%
+\begin{align}
+\mathbf{y} \mid \mathbf{d} &\sim D(\boldsymbol{\mu}), \\
+\boldsymbol{\mu} &= g^{-1}(\boldsymbol{\eta}), \\
+\boldsymbol{\eta} &= \mathbf{X}\boldsymbol{\beta} + \mathbf{W}\mathbf{d},
+\end{align}
+%
+where $D(\boldsymbol{\mu})$ denotes a distribution from the exponential family. A common assumption is that the random effects are centered at zero and follow a normal distribution. Conditional on the random effects, the responses follow the specified distribution independently, while dependence between observations is introduced through the shared random effects. Compared with the generalized linear model, the GLMM therefore adds a dependence structure, and compared with the linear mixed model it allows the response to be non-Gaussian.
+
+
+\section{Quantitative Genetics and Genetic representation}
+
+This section places the statistical models introduced above in their biological context. We first define the biological concepts and quantities needed to understand the modelling problem, and then introduce the animal model as a central framework in quantitative genetics. Finally, we consider several important formulations of this model, including pedigree-based, GRM-based, and marker-based approaches.
+
+\subsection{Basic Concepts and Terminology of Quantitative Genetics}
+
+Many characteristics of organisms differ between individuals. Such characteristics are called traits. Examples include body mass, wing length, eye colour, survival, and dispersal. Some of these traits are measured on a continuous scale, such as body mass, whereas others are recorded as categories, such as survival (yes/no) or dispersal (dispersed/did not disperse). A central aim of quantitative genetics is to understand why individuals differ in such traits and to describe how much of this variation is associated with genetic differences and how much is associated with environmental conditions (\cite{falconer_introduction_1989}).
+
+The observed value of a trait for a given individual is called its phenotype. For example, if the trait is body mass, then a phenotype could be 1000 grams, and if the trait is survival, the phenotype could be yes. Phenotypes are influenced by both genetic and environmental factors. The genetic makeup of an individual is called its genotype. Genetic information is stored in DNA, which is organized into chromosomes. A gene is a segment of DNA, and the position of a gene on a chromosome is called its locus. Different versions of the same gene are called alleles, and because individuals may carry different alleles, they may also differ in genetic predisposition for a trait (\cite{griffiths_introduction_2015}).
+
+Many traits of interest are influenced by several genes rather than a single gene. Such traits are often referred to as polygenic. This means that differences in phenotype usually cannot be explained by one genetic factor alone, but instead reflect the combined influence of many genetic differences together with environmental effects. In this thesis, the phenotype is the outcome we want to describe and predict, while genetic and environmental information represent possible sources of variation behind that outcome (covariates). 
+%This is the biological motivation for the modelling framework introduced in the next section, where these sources of variation are represented statistically (\cite{falconer_introduction_1989, wilson_ecologists_2010}).
+
+
+\subsection{Phenotypic variation, additive effects and heritability}
+
+Phenotypic variation among individuals is a defining feature of populations. In quantitative genetics, the aim is to describe this variation in terms of genetic and environmental sources (\cite{falconer_introduction_1989}). For an individual, the phenotype $P$ can in the simplest case be written as
+\[
+P = G + E,
+\]
+where $G$ denotes the genetic component and $E$ the environmental component. Under the assumption that genetic and environmental effects are independent, the phenotypic variance can be decomposed as
+\[
+V_P = V_G + V_E,
+\]
+where $V_P$ is the total phenotypic variance, $V_G$ the genetic variance, and $V_E$ the environmental variance (\cite{falconer_introduction_1989}).
+
+The genetic component can be further decomposed into biologically distinct parts,
+\[
+G = A + D + I,
+\]
+where $A$ is the additive genetic effect, $D$ the dominance deviation, and $I$ the epistatic deviation. Here, dominance refers to interactions between alleles at the same locus, whereas epistasis refers to interactions between alleles at different loci (\cite{lynch_genetics_1998}). Under the usual simplifying assumption that these components are uncorrelated, the genetic variance can be written as
+\[
+V_G = V_A + V_D + V_I.
+\]
+Among these components, the additive genetic effect is the main quantity of interest. It represents the sum of the average effects of alleles carried by an individual, and it is the part of the genetic signal that is transmitted predictably from parents to offspring. For that reason, it is the component most relevant for statistical prediction of inherited trait differences. The additive genetic value of an individual, expressed relative to the population mean, is called its breeding value (\cite{wilson_ecologists_2010}).
+
+A related quantity is the narrow-sense heritability,
+\[
+h^2 = \frac{V_A}{V_P} \ .
+\]
+Heritability describes the proportion of phenotypic variation in a population that is attributable to additive genetic differences between individuals. It does not describe how much of a single individual’s phenotype is genetic, but rather how much of the observed variation across individuals can be associated with additive genetic effects. This makes heritability useful because it indicates how informative phenotypic differences may be about underlying genetic differences, and therefore how much scope there is for predicting breeding values from data (\cite{visscher_five_2012}).
+These quantities also motivate the idea of genomic prediction. In this thesis, genomic prediction refers to the use of genomic information to estimate breeding values or other genetic contributions to a trait. 
+
+\subsection{The Classical Animal Model}
+
+To study genetic contributions to trait variation, quantitative genetics requires a statistical framework that connects the biological concepts introduced above to observable data. % [OK - project]
+The classical animal model provides such a framework. In its standard form, the animal model is formulated as a linear mixed model (LMM), and can therefore be understood as a quantitative-genetic specialization of the mixed-model framework introduced in Section~2.1. % [BRO]
+For non-Gaussian traits, the same basic idea can be extended within a generalized linear mixed model (GLMM) framework, but the classical Gaussian formulation provides the natural point of departure \parencite{wilson_ecologists_2010, kruuk_estimating_2004, lynch_genetics_1998}. % [STYRK]
+
+In words, the animal model describes phenotypic variation through fixed effects, additional non-genetic random effects, an additive genetic effect, and residual variation. % [SJEKK]
+What distinguishes the animal model from a general LMM is not merely the presence of random effects, but the inclusion of a genetic random effect that represents the breeding values of individuals and is structured by relatedness. % [OK - project]
+The breeding value introduced in the previous subsection thus reappears here as a model-based latent quantity: it is not directly observed, but inferred from the data through the covariance structure imposed on the genetic random effect. % [BRO]
+
+Using the notation from Section~2.1, a general animal model may be written as
+\[
+\mathbf{y} = \mathbf{X}\boldsymbol{\beta} + \mathbf{W}\mathbf{d} + \mathbf{W}_a\mathbf{a} + \boldsymbol{\varepsilon},
+\]
+where $\mathbf{X}\boldsymbol{\beta}$ denotes the fixed-effects part of the model, $\mathbf{W}\mathbf{d}$ represents additional non-genetic random effects, $\mathbf{W}_a\mathbf{a}$ is the additive genetic term, and $\boldsymbol{\varepsilon}$ is the residual term \parencite{kruuk_estimating_2004, FILL_FREDERICK_ANIMALMODEL}. % [STYRK]
+Here, the fixed effects may represent measured covariates that systematically influence the phenotype, while the non-genetic random effects may account for grouping or hierarchical structure, such as year, nest, or other shared environmental sources of variation. % [SJEKK]
+The additive genetic term $\mathbf{a}$ then represents the breeding values of individuals and is the defining component of the animal model. % [OK - project]
+
+As in the LMM framework introduced in Section~2.1, random effects are specified through their covariance structure. % [BRO]
+In the animal model, the vector of breeding values is typically assumed to follow a multivariate normal distribution,
+\[
+\mathbf{a} \sim N(\mathbf{0}, \mathbf{\Sigma_a}),
+\]
+where $\boldsymbol{\Sigma}_a$ denotes the covariance structure of the additive genetic effects \parencite{wilson_ecologists_2010, lynch_genetics_1998, kruuk_estimating_2004}. % [OK - project]
+This covariance structure is the key ingredient that turns a general mixed model into an animal model: it encodes which individuals are expected to resemble one another genetically, and therefore how information is shared across the population when breeding values are estimated. % [STYRK]
+
+The animal model is therefore the statistical expression of the additive genetic signal discussed in the previous subsection. % [BRO]
+It provides a framework in which breeding values can be estimated while separating additive genetic variation from fixed effects, additional non-genetic random effects, and residual noise. % [BRO]
+At the same time, this formulation immediately raises a further question: how should relatedness, and therefore genetic similarity, be represented in practice? % [BRO]
+That question motivates the next subsection, where different representations of genetic information are introduced.
+
+
+\subsection{Representing Genetic Information}
+
+The previous subsection introduced the animal model as a framework for estimating the additive genetic signal. A further question is how this signal is represented in practice. % [BRO]
+In quantitative genetics, the same underlying additive genetic variation can enter the model through different representations, ranging from pedigree-based relatedness to genomic relationship matrices and direct marker-based models. % [OK - project]
+These alternatives differ in how explicitly they encode genetic information, but they are all attempts to represent the same biological quantity: additive genetic similarity among individuals \parencite{wilson_ecologists_2010, kruuk_estimating_2004, ashraf_genomic_2022}. % [STYRK]
+
+Traditionally, additive genetic similarity has been represented through pedigree information. In that setting, relatedness is derived from known ancestry, and the covariance structure of the breeding values is specified through the expected proportion of alleles shared by descent between individuals. % [OK - project]
+This gives a pedigree-based animal model, where the additive genetic covariance is determined by the pedigree relationship matrix, often denoted by $\mathbf{A}$ \parencite{kruuk_estimating_2004, lynch_genetics_1998}. % [STYRK]
+A pedigree-based representation is conceptually appealing because it follows directly from the inheritance structure of the population. At the same time, it relies on expected relatedness rather than realized genetic similarity, and in wild populations pedigrees may be incomplete or uncertain. % [OK - project]
+As a result, pedigree-based models may only imperfectly capture the additive genetic resemblance that is actually present in the data \parencite{ashraf_genomic_2022}. % [OK - project]
+
+The availability of dense SNP data made it possible to move from expected relatedness to realized genomic relatedness. Instead of deriving similarity from pedigree links alone, one can construct a genomic relationship matrix (GRM) directly from marker data, thereby measuring how genetically similar individuals are at the observed loci. % [OK - project]
+A commonly used formulation is the VanRaden estimator,
+\begin{equation}
+\mathbf{G} = \frac{\mathbf{Z}\mathbf{Z}^{\top}}{2\sum_j \rho_j(1-\rho_j)},
+\label{eq:VanRanden_est}
+\end{equation}
+where $\mathbf{Z}$ is the centered genotype matrix and $\rho_j$ is the allele frequency at marker $j$ \parencite{vanraden_efficient_2008}. % [OK - project]
+Using $\mathbf{G}$ in place of pedigree-based relatedness yields a genomic animal model. Conceptually, this is still an animal model for the same additive genetic signal, but the covariance structure is now informed by realized marker similarity rather than expected ancestry \parencite{ashraf_genomic_2022, vanraden_efficient_2008}. % [STYRK]
+
+A further step is to represent the genomic contribution directly through the marker matrix itself rather than through a relationship matrix derived from it. In marker-based regression, the phenotype is modeled as
+\[
+\mathbf{y} = \mathbf{X}\boldsymbol{\beta} + \mathbf{W}\mathbf{d} + \mathbf{Z}\mathbf{u} + \boldsymbol{\varepsilon},
+\]
+where $\mathbf{X}\boldsymbol{\beta}$ denotes fixed effects, $\mathbf{W}\mathbf{d}$ additional non-genetic random effects, $\mathbf{Z}$ is the marker matrix, and $\mathbf{u}$ is the vector of marker effects \parencite{meuwissen_prediction_2001, aspheim_bayesian_2024}. % [OK - project]
+In this formulation, breeding values are obtained directly from marker effects, since
+\[
+\mathbf{a} = \mathbf{Z}\mathbf{u},
+\qquad
+a_i = \sum_{j=1}^m Z_{ij}u_j .
+\]
+Thus, the additive genetic signal is no longer represented indirectly through pairwise relatedness, but through the summed contribution of marker effects across the genome \parencite{meuwissen_prediction_2001, aspheim_bayesian_2024}. % [OK - project]
+
+These two genomic representations are closely related. The GRM is constructed from the same marker matrix $\mathbf{Z}$ that appears explicitly in marker-based regression, which means that both formulations are built from the same underlying genomic information. % [OK - project]
+The difference lies in how this information enters the model: the GRM summarizes marker information into pairwise genomic similarity, whereas marker-based models retain the markers themselves as predictors. % [STYRK]
+This direct representation is attractive for genomic prediction because it makes it possible to estimate breeding values from observed marker effects and to work more flexibly with different assumptions about genomic architecture \parencite{meuwissen_prediction_2001, aspheim_bayesian_2024}. % [STYRK]
+
+At the same time, representing genetic information at marker level introduces new statistical challenges. Marker datasets are typically high-dimensional, with far more markers than individuals, and the markers are often strongly correlated due to linkage disequilibrium. % [OK - project]
+As a consequence, richer genomic representations do not simply provide more information; they also make simplification, regularization, and dimension reduction unavoidable \parencite{aspheim_bayesian_2024, gianola_priors_2013}. % [BRO]
+This is precisely the point where the discussion moves from genetic representation to high-dimensional genomic modelling, which is the focus of the next subsection.
+
+\section{High-Dimensional Genomic Modelling and BPCRR}
+
+This section introduces methods for handling high-dimensional genomic data. We begin by explaining how the structure of the SNP matrix gives rise to a high-dimensional modelling problem, and briefly introduce SNPs as the genetic markers underlying this representation. We then present principal component analysis as a method for dimension reduction, followed by the Bayesian alphabet as a class of regularization methods for controlling model complexity. Finally, we introduce Bayesian Principal Component Ridge Regression, which combines dimension reduction and shrinkage within a single modelling framework, and present the theoretical background relevant to this thesis.
+
+\subsection{Single Nucleotide Polymorphism}
+% and LD
+
+
+%What, how, why, LD + def
+To quantify genetic contributions to phenotypic variation, information about genetic differences among individuals is required.
+With advances in genotyping technology, it is now possible to trace genetic effects directly at the DNA level through \textit{single nucleotide polymorphisms} (SNPs). A SNP is a locus on the DNA where individuals in a population differ by a single nucleotide base (\cite{brookes_essence_1999}). 
+%Such variation is normal and can be found at approximately every $1000$ locus (\cite{sachidanandam_map_2001}). 
+We classify a locus as a SNP if the \textit{minor allele} frequency is at least $1\%$ (\cite{karki_defining_2015}). 
+The minor allele is the least frequent allele at a given locus (\cite{conner_primer_2004}; \cite{brookes_essence_1999}). 
+%
+In genomic analysis, the combination of alleles at a SNP locus is usually coded as $\{0,1,2\}$, representing the number of minor alleles in the genotype. 
+%This representation forms the basis for estimating breeding values and additive genetic variance, as it allows each SNP to contribute linearly to the total genetic value of an individual.
+
+Most SNPs do not directly alter phenotypes, as they often occur in non-coding regions of the DNA (\cite{visscher_five_2012}). However, they serve as effective genetic markers due to \textit{linkage disequilibrium} (LD), the non-random association of alleles at different loci (\cite{bush_chapter_2012}). Alleles that are physically close on the chromosome tend to be inherited together, and a SNP in strong LD with a causal locus can therefore act as an indirect indicator of its effect (\cite{ashraf_genomic_2022}). These properties make SNPs highly useful for studying polygenic traits (\cite{syvanen_accessing_2001}).
+
+\subsection{Principal components as a low-dimensional representation of genomic data}
+
+% this whole section is from the project 
+
+A common strategy to address ill-posedness is to apply some form of dimension reduction on the SNP matrix before fitting the model. Principal component analysis (PCA) provides an intuitive way to summarize genotypic information, by replacing the original SNPs with a smaller set of \textit{principal components} (PCs). Each PC is a weighted sum of the original SNPs, and PCA chooses these weights so that the first component captures the largest overall pattern of variation in the SNP matrix across individuals.
+Subsequent components capture as much of the remaining variation as possible while being constrained to be orthogonal to the previous ones. The resulting PCs are therefore uncorrelated, and projecting the data onto the first few PCs often preserves most of the variation present in the original data
+(\cite{abdi_principal_2010}).
+
+
+In practice, PCs are obtained through singular value decomposition (SVD) of the SNP-matrix $\mathbf{Z}$ (\cite{aspheim_bayesian_2024}). The SVD of $\mathbf{Z}$ is given by
+%
+$$
+\mathbf{Z = U} \Lambda \mathbf{ V^\top} \ , 
+$$
+%
+where $\mathbf{U}$ has dimensions $m \times m$, $\Lambda$ is the diagonal $m \times N$ matrix with singular values on the diagonal, and $\mathbf{V}$ is the $N \times N$ matrix of eigenvectors. The singular values in $\Lambda$ are ordered such that $\lambda_1 \geq \lambda_2 \geq \dots \geq \lambda_N$, and each $\lambda_j^2$ is proportional to the variance explained by the corresponding PC. For additional details see \textcite{abdi_principal_2010}.
+
+The first $K$ PCs are then obtained by projecting the standardized SNPs onto the first $K$ eigenvectors of $\mathbf{Z^\top Z}$:
+%
+$$\mathbf{Z^\star = ZV}_{1:K} \ ,$$
+%
+where $\mathbf{Z^\star}$ is the projection of the SNP matrix on the $K$-dimensional PC-space. $\mathbf{V}_{1:K}$ is the first $K$ columns of $\mathbf{V}$. Since the leading PCs capture the largest sources of variation in the SNP matrix, a relatively small number of components often explains a substantial proportion of the total genotypic variation. As a result, PCA condenses thousands of correlated genetic markers into a smaller set of orthogonal predictors, reducing dimensionality while preserving the core genetic signal needed for modeling.
+
+\subsection{Shrinkage and Bayesian regularization}
+
+% this whole section is from the project 
+
+% Motivation for shrinkage
+Polygenic traits are expressed through small contributions from multiple markers. Applying regularization to the marker effects helps stabilize their estimates and prevents overfitting. A common regularization method is to induce shrinkage with Bayesian methods. Intuitively, shrinkage can be described as weighting prior knowledge against information added by the data. If a model-estimated marker effect is small and uncertain, we trust the prior knowledge more and shrink the effect to zero. On the other hand, effects with estimates further from zero are kept in the model, as we trust the data more. 
+Shrinkage also reduces the variance of the estimated effects by forcing the estimates closer to zero.
+This reinforces patterns consistent with the data. In other words, the goal is to limit the influence of small and uncertain effects by penalizing model complexity. This results in more reliable predictions and clearer interpretation, especially when the number of markers exceeds the number of individuals.    
+
+% BRR
+
+The simplest Bayesian shrinkage method is ridge regression. This is the Bayesian equivalent of the genomic animal model, and in this case all effects are penalized uniformly (\cite{gianola_priors_2013}). The penalization is applied through the prior assumption on the marker effects, and for ridge regression, we assume a normal prior with identical variance for the effect sizes, 
+%
+$$
+u_j|\sigma_u^2 \sim N(0, \sigma_u^2) \ .
+$$
+%
+The variance parameter $\sigma_u^2$ is either assumed known or assigned a weakly informative hyper-prior, for example an inverse-gamma distribution (\cite{aspheim_bayesian_2024}). Note that assigning a common prior variance to all marker effects implies independence between the effects. 
+Different prior choices for the marker effects lead to different forms of shrinkage. This flexibility forms the basis of the Bayesian alphabet (\cite{gianola_priors_2013}).
+
+% Bayesian alphabet (A, B, and R) 
+The first model introduced to the alphabet was BayesA (\cite{meuwissen_prediction_2001}). The normal distribution assumption is retained for the marker effects, but with a variance specific to each marker. Each variance follows a scaled inverse-chi-square prior, which produces heavy tails on the marker effect prior. These heavy tails translate to heavy shrinkage on most effects, while a small number of markers avoid this shrinkage. 
+%
+BayesB modifies the idea from BayesA by allowing different distributions on the marker effects. Each marker has a high prior probability of having exactly zero effect, and a small probability of following a heavy-tailed distribution (\cite{meuwissen_prediction_2001}). In this scenario, both shrinkage and variable selection are used to exclude SNPs from the model. 
+%
+BayesR generalizes these ideas by allowing a mixture of normal distributions with different variances (\cite{gianola_priors_2013}). In practice, this mixture reflects the assumption that most markers have no effect, while a few markers contribute at different scales, an assumption consistent with findings from \textcite{aspheim_bayesian_2024}. BayesR has repeatedly demonstrated competitive predictive accuracy and robustness to the underlying genetic architecture (e.g., \cite{aspheim_bayesian_2024, ashraf_genomic_2022}).
+
+\subsection{Bayesian principal component ridge regression}
+
+\todo{Add point about independence of PCs vs,. usually not independence between markers }
+
+Bayesian principal component ridge regression (BPCRR) combines dimension reduction and shrinkage in a single framework. Instead of applying ridge-type shrinkage directly to the original SNP effects, BPCRR first transforms the genotype matrix using PCA and then places shrinkage priors on the effects of the retained principal components. In this sense, BPCRR is built on two linked ideas: genomic information is first represented in a reduced orthogonal basis, and the effects in that basis are then regularized.
+
+Let $\mathbf{Z}$ denote the centered marker matrix and let its singular value decomposition be
+\[
+\mathbf{Z} = \mathbf{U}\mathbf{\Lambda}\mathbf{V}^{\top}.
+\]
+Using the first $K$ eigenvectors, the projected marker matrix is
+\[
+\mathbf{Z}^{*} = \mathbf{Z}\mathbf{V}_{1:K}.
+\]
+The genomic part of the model is then written in terms of the PC scores rather than the original SNPs. If $\mathbf{u}^{*}$ denotes the vector of PC effects, the genomic contribution becomes
+\[
+\mathbf{a} = \mathbf{Z}^{*}\mathbf{u}^{*}.
+\]
+A ridge-type Bayesian prior is then assigned to the PC effects,
+\[
+u_k^{*} \mid \sigma_{u^{*}}^2 \sim N(0,\sigma_{u^{*}}^2), \qquad k = 1,\dots,K.
+\]
+This prior induces shrinkage of the component effects in the same spirit as ordinary ridge regression, but now in a predictor space where the variables are orthogonal by construction.
+
+The motivation for BPCRR is that genomic marker data rarely satisfy the implicit independence assumptions that make simple ridge priors most natural at SNP level. Because SNPs are correlated through linkage disequilibrium and other forms of genomic structure, shrinkage directly on raw markers may be sensitive to redundancy and dependence among predictors. By moving to PC space first, the regression is instead formulated in terms of orthogonal components that still capture the dominant genomic variation. Shrinkage can then be applied in a more stable basis. Conceptually, BPCRR therefore combines the representational advantage of PCA with the stabilizing effect of ridge regularization.
+
+An additional practical advantage is that BPCRR provides an explicit handle on model complexity through the number of retained principal components $K$. The choice of $K$ determines how much genomic variation is retained in the reduced representation, while the ridge prior controls the effective influence of the included components. BPCRR is therefore especially useful when one wants to study how simplification of genomic information affects prediction. That is precisely the role it plays in this thesis. The method offers a principled way to move from a very high-dimensional SNP matrix to a model that is both estimable and biologically meaningful, while still preserving a clear connection to additive genetic signal.
+
+In relation to the wider literature, BPCRR can be seen as occupying an intermediate position between direct SNP-based shrinkage models and more aggregated genomic representations such as the GRM. It retains marker-derived information more explicitly than relationship-matrix approaches, but it avoids fitting the full set of correlated SNPs directly. This makes it a natural framework for the present thesis, where the aim is not only to predict a trait, but also to examine how the complexity of the genomic representation influences what is recovered from the data. The next section builds on this by turning to binary traits, where the same general genomic ideas must be interpreted in the presence of a non-Gaussian response and an underlying latent scale.
+
+\section{Binary traits, liability and scales}
+
+\subsection{Observation scale heritability vs. latent scale heritability}
+
+For binary traits we usually work with the latent scale heritability where the classical definition of heritability still apply, because the effects are additive. On the other hand, for linear models the heritability is defined on the observation scale, so we need to be able to do the transformation from the liability to the observation scale.
+
+Latent heritability:
+$$
+h^2_l = \frac{\text{Var}(\mathbf{a})}{\text{Var}(\boldsymbol{\eta)}}
+$$
+
+Observation heritability:
+$$
+h^2_o = \frac{\text{Var}(\mathbf{a)}}{\text{Var}(\mathbf{y})} \, 
+$$
+for a binary trait Var$(\mathbf{y}) = N\mathbf{p}(\mathbf{1} - \mathbf{p})$. 
+
+\subsection{Fair evaluation metrics}
+
+\subsubsection{PR-AUC}
+
+The PR-AUC measure the models ability to capture the true positives (TP) without generating too many false negatives (FN), and is therefore used instead of the more common ROC-AUC, because the ROC-AUC can give a bit overoptimistic picture of the performance when the data is unbalanced. It is importat to remember that PR-AUC is not comparable accorss datasets, because the value have to be interpreted in context with the dataset prevalence, i.e the proportion of true positives out of all the data points. 
+
+\subsubsection{Spearman Correlation}
+

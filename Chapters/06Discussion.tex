@@ -1,0 +1,62 @@
+
+% Comments on results
+
+\subsection{Simulations}
+% simulation - difference from project 
+this is likely due to noise in the simulation of breeding values, and more simulation should be done to minimise this noise.
+
+Would also be interesting to do simulations with different prevalence to get a feeling of how sensitive the model is to that.  
+
+% simulations - AUC: 
+AUC appears to not be a very good tool for selecting $K$, compared to the correlation, but in real life the correlation with the true breeding values is not something we can calculate, so we use it anyway. In addition, good predictive performance measured with AUC does not seem to have a clear connection to the "wellness" of the predicted BVs measured by the correlation with the true breeding values, also for the linear model, which is kind of concerning? but at the same time, this correlation corresponds to ranking, not absolute correlation, so maybe this changes things and what to expect. 
+
+% simulations - correlations: 
+The agreement between the linear and binary model in this case is expected, because the spearman correlation is a metric for ranking the individuals, not the "absolute" correlation, and the only difference is not doing the transformation (which is one-to-one), so when we only include the genetic component in the prediction model both the linear and the binary model arrives at the same conclusion wrt. ranking. 
+%
+I think the overall pattern of the same $K$ maximizing correlation for all heritability levels is more weird, but that could be subject to noise from the simulation setup, and not a pattern that is necessary true. Therefore someone should do more simulations than I had time for. 
+%
+that the correlation increase more rapidly when the heritability increase could suggest that with higher heritability the "information" in the later PCs are more important to the prediction than for lower heritability. Which is expected, since the genetic components contribution to the variance in the trait is higher and therefore we can gain more (relatively) my also including more genetic information. So for traits with higher heritability increasing the number of PCs should increase the ranking of the individuals according to the true breeding values. The annoying this is, this does not appear to coincide with the prediction performance for either models. 
+
+%simulation: Heritability
+Exactly the same results as in the project, and I guess for the same reasons. Also the linear model is as good as the binary one here, why? (Need to think a bit about this)  
+
+\subsection{Real data analysis}
+
+% real data: lin vs. bin 
+If the task you wan to do is. f.eks select highest $20\%$ you could use a linear model instead of a binary one, because they essentially rank the individuals quite equally.
+
+% compared with simulations
+The relative increase in predictive performance is higher here than in the simulations, likely due to the inclusion of the other covariates in addition to the genetic components. 
+
+% PCs vs. GRM
+Based on \autoref{fig:all_models_compared} it does not makes sense to use the GRM over the BPCRR due to equal accuracy but very different runtime. Therefor someone should try to develop some theory on how to select the number of PCs prior to running the models. \textcite{aspheim_bayesian_2024} has something for continuous traits here, and I could maybe be extended to binary traits in some way? Or since the linear and binary predictions are som similar maybe you could just use their formula as a guideline for saving time on testing very high values of $K$. 
+
+
+\subsubsection{Corr between lin and bin BVs and predictions}
+
+we already know that BVs are not the most important predictor for this trait (\cite{saatoglu_genetic_2024}), and that the heritability is quite low, so the bad separation is expected. that the separation improves slightly when we look at the predicted scores/probabilities also makes sense, because here the other covariates are also considered, and we suspect that f.eks. natal island and environmental effects are important for dispersal. Still the separation is not very good, so there are probably (of course) effects/mechanisms that is not well accounted for in this simple model. but again, considering the previous prediction accuracy, and these plots, the simplification to a linear model does not appear to give different results than the binary one -> adding the fancy transformation does not give you a predictive advantage in this case. 
+
+there is also a group of individuals that the two models does not agree on, where the linear breeding value is higher than the binary one, and so that they become their own group in the breeding value plot. this group was mainly from island 38 (Aldra), and they had a significantly higher inbreeding coefficient than the overall expected on for the data. CAN WE THEN CONCLUDE SOMETHING ABOUT THE LINEAR VS BINARY MODEL WRT. THIS? Because, why would a higher innbreeding coefficient result in higher BV compared to the rest of the individuals in this data? 
+
+% distribution plots 
+Looking at the BV dists and the prediction score dists for the two models, the range difference is expected. With the binary formulation, we "force" the prediction to be on the interval $[0,1]$, while the Gaussian formulation is allowed to exist on the whole real line, but we obs that this also takes ranges close to the "correct" interval, but is a bit shifted to the left, towards negative values.
+the breeding values also exist on different ranges and scales, the gaussian BVs range over ca half the range of the binary ones, and the distributions are more squished. But, there also appears that the separation of the two groups are better in the probability score setting than in the BV setting, which indicates that the other variables contribute with meaningful information to the prediction, which allows us to separate better than only based on genetics. So even though they in ranking agree like shown in the correlation plots, the distributions are quite different both in range and in shape. 
+
+
+
+% Aldra "problem" 
+In the BVs plot we observe that they are a clear subgroup where the linear and binary models does not agree on the BVs for mostly this island, but this structure does not appear in the predicted score/probability plot. This island is a bit special, it was colonized by one female and two males, and as we can see in the appendix they have very high inbreeding, so maybe the genetic "composition" of these individuals are a bit different for this subgroup of individuals compared to the overall data, so maybe the PCA does not capture these individuals good enough? like the primary directions of variance in the SNP matrix is not aligning so well with these individuals, and in some way this ?    
+
+Should look at the Island effect of Aldra in both models, and see if it is a difference.  
+
+\subsubsection{robustness (island 61 problem)}
+
+the intention here is to maybe say that the model picked this up that these individuals were dispersers, and they actually also had a higher BV overall than the rest of the population, but there are not really any variation for this island, so coming from island 61 is a very clear predictor of dispersal in our data, which may not be the case in reality. these individuals can give an artificially high accuracy for the model, and if we compare the accuracy of the models trained on the full data and the model without these individuals (\autoref{fig:remove_island61}) the median accuracy without is slightly higher, and the variance is lower, so we decided to remove them, and fit all the models without these individuals. 
+
+\subsection{Applications analysis}
+
+Not completely sure how to interpret that the PR-AUC for the BVs in the application part of the results are so close to the PR-AUC values for the whole model in the real data results. In my head BVs is not the most important predictor in this model, so that the relative increase is so high compared to the full model does not make sense to me. Or, they can not be compared really? Or the PR-AUCs are highly correlated, and thus capture the same signal in a way, so the BVs are maybe not independent of the other effects included in the model, and this CV will capture som of that effect also? Also, I understand it such that similar PR-AUC means similar ranking, so essentially, ranking by BV or ranking by the full model is almost as good/bad for ranking the individuals from very likely to disperse to least likely to disperse? 
+
+\section{Future work}
+
+Include a section about what should or could be done in future research, or explain any recommended next steps based on the results you got. This should be the last section in the discussion.
