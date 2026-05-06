@@ -282,6 +282,18 @@ In addition to the main dispersal dataset, a second dataset was used to estimate
 
 The autumn dispersal phenotype, indicates whether an individual had dispersed from its natal island by autumn. Among the $1142$ individuals with recorded autumn dispersal status, $105$ had dispersed by autumn, and $50$ of these did not recruit the following year. This phenotype therefore captures dispersal events that occurred before recruitment, including dispersal among individuals that would not have received a dispersal phenotype in the main dataset.
 
+\subsection{Data Subsets used in the Empirical Analysis}
+
+% say that a reduced dataset was used for the assesment of the model performance, and that the full dataset, and the autumn dispersal data was used for the Robustness of the estimted BVs. 
+
+Before fitting the empirical models, the dispersal dataset was examined to identify individuals whose dispersal status was not directly comparable to the main within-system dispersal phenotype. A total of $115$ individuals had dispersed into the Helgeland system from outside the study system, mostly from Vega but also from other islands. These individuals all had an observed dispersal phenotype of $y = 1$, meaning that this group provided no variation with respect to the trait. This group if individuals is therefor a biased sample from this island, and will not be representative for the whole population on this island. As a consequence of this bias, we decided to exclude these individuals when assessing model performance and ranking in the main analysis. 
+
+%Since natal island was included as an environmental random effect and is known to influence dispersal (KILDE PÅ DET!), these individuals were excluded from both model fitting and model evaluation in the main empirical analyses of the dispersal trait.
+
+This exclusion was applied to the analyses comparing the binomial and Gaussian BPCRR models, the comparison with the Bayesian animal model, and the ranking-based model comparisons. The excluded individuals were included again when breeding values were generated for downstream analyses. In this setting, the aim was not to evaluate model performance for the main dispersal phenotype, but to obtain breeding value predictions for the available individuals.
+
+The autumn dispersal dataset was used only for analyses relevant to the downstream use of the estimated breeding values. Therefore, the autumn dispersal trait was included in the selection of the number of principal components and in the 10-fold cross-validation used to assess whether the estimated breeding values predicted dispersal.
+
 \section{Simulations}
 
 This simulation study was designed to evaluate how BPCRR performs for binary traits when the observation model is either correctly specified as binomial or approximated by a linear model. Since BPCRR represents the marker-based genetic signal through a reduced set of principal components, the simulations also allowed us to investigate how model performance depends on the number of PCs included in the fitted model. Binary phenotypes were generated under a known marker-based genetic architecture across different heritability levels, making it possible to assess both predictive performance and recovery of the underlying genetic signal.
@@ -399,7 +411,7 @@ For the linear model, the same simulated binary phenotypes were analysed using t
 \mathbf{y} = \beta_0\mathbf{1}_N + \mathbf{a} + \boldsymbol{\varepsilon},
 \]
 %
-where $\beta_0$ is the intercept, $\mathbf{a}$ is the PC-based additive genetic effect, and $\boldsymbol{\varepsilon}$ is the residual error term. This model therefore uses the same representation of the additive genetic component as the binomial model, but differs in the assumed observation model and residual variance structure.
+where $\beta_0$ is the intercept, $\mathbf{a}$ is the PC-based additive genetic effect, and $\boldsymbol{\varepsilon}$ is the residual error term. This model therefore uses the same representation of the additive genetic component as the binomial model, but differs in the assumed observation model and residual variance structure. we expect that this linear approximation will perform poorer than the binary formulation, because the model that generates the response is the same so the one we use to fit the model in the binary case. For the linear mode this is not the case. 
 
 \subsubsection*{Ridge Regression with Prior Calibrations}
 
@@ -570,15 +582,6 @@ Lastly, to evaluate the model's ability to recover the correct additive genetic 
 
 Following the simulation study, the BPCRR framework was applied to the empirical dispersal data. In contrast to the simulation setting, the empirical models included additional fixed and random effects to account for relevant biological and sampling structure, following the general LMM and GLMM formulations introduced in Section~\ref{sec:stat_mod}. The analysis began by selecting the number of principal components to include in the genetic component. The binomial and Gaussian BPCRR models were then compared with a standard Bayesian animal model commonly used for breeding value estimation. Model agreement was further assessed by comparing the ranking of individuals according to estimated breeding values, predicted probabilities, and linear prediction scores. Finally, since the estimated breeding values were intended for downstream analyses, their predictive ability was evaluated using 10-fold cross-validation. This final analysis was conducted for both the main dispersal trait and the autumn dispersal trait, while the remaining analyses were performed only for the main dispersal trait.  
 
-\subsection{Data Subsets used in the Empirical Analysis}
-
-% say that a reduced dataset was used for the assesment of the model performance, and that the full dataset, and the autumn dispersal data was used for the Robustness of the estimted BVs. 
-
-Before fitting the empirical models, the dispersal dataset was examined to identify individuals whose dispersal status was not directly comparable to the main within-system dispersal phenotype. A total of $115$ individuals had dispersed into the Helgeland system from outside the study system, mostly from Vega but also from other islands. These individuals all had an observed dispersal phenotype of $y = 1$, meaning that this group provided no variation with respect to the trait. Since natal island was included as an environmental random effect and is known to influence dispersal (KILDE PÅ DET!), these individuals were excluded from both model fitting and model evaluation in the main empirical analyses of the dispersal trait.
-
-This exclusion was applied to the analyses comparing the binomial and Gaussian BPCRR models, the comparison with the Bayesian animal model, and the ranking-based model comparisons. The excluded individuals were included again when breeding values were generated for downstream analyses. In this setting, the aim was not to evaluate model performance for the main dispersal phenotype, but to obtain breeding value predictions for the available individuals.
-
-The autumn dispersal dataset was used only for analyses relevant to the downstream use of the estimated breeding values. Therefore, the autumn dispersal trait was included in the selection of the number of principal components and in the 10-fold cross-validation used to assess whether the estimated breeding values predicted dispersal.
 
 \subsection{Empirical Model Formulation}
 
