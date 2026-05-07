@@ -1,5 +1,78 @@
 
-This chapter presents the methodological framework used to evaluate BPCRR for binary dispersal traits. The aim is to assess how BPCRR performs in a binary-trait setting, and to investigate whether a Gaussian linear approximation is sufficient for prediction of binary traits and estimation of breeding values. The chapter begins by introducing the general statistical model formulations used throughout the thesis, contrasting a binomial model for binary responses with a linear model fitted on the observed $0/1$ scale. The empirical data from the Helgeland house sparrow system are then described. Following this, a simulation study is presented in which binary phenotypes are generated under a known marker-based genetic architecture, making it possible to evaluate predictive performance and recovery of the underlying genetic signal. The chapter concludes by describing the empirical analyses of dispersal, including selection of the number of principal components, comparison between BPCRR and genomic animal models, and cross-validation of estimated breeding values for downstream analyses.
+This chapter presents the methodological framework used to evaluate BPCRR for binary dispersal traits. The aim is to assess how BPCRR performs in a binary-trait setting, and to investigate whether a Gaussian linear approximation is sufficient for prediction of binary traits and estimation of breeding values. The chapter begins by describing the empirical data from the Helgeland house sparrow system, including the response variables, genomic and environmental data, and the data subsets used in the analyses. The general statistical model formulations used throughout the thesis are then introduced, contrasting a binomial model for binary responses with a linear model fitted on the observed $0/1$ scale. Following this, a simulation study is presented in which binary phenotypes are generated under a known marker-based genetic architecture, making it possible to evaluate predictive performance and recovery of the underlying genetic signal. The chapter concludes by describing the empirical analyses of dispersal, including selection of the number of principal components, comparison between BPCRR and genomic animal models, and cross-validation of estimated breeding values for downstream analyses.
+
+\section{Data Description}
+
+The data motivating this project come from a long-term study of a meta-population of house sparrows on an island system off the coast of Helgeland in northern Norway. The meta-population spans 18 islands divided into two main habitat types: the \textit{inner islands}, situated closer to the mainland, and the \textit{outer islands}, further from the mainland. Extensive fieldwork conducted during breeding seasons and autumns since $1993$ has ensured that most individuals have been marked and followed from hatching to death, with blood samples collected for DNA extraction and genotyping (\cite{saatoglu_genetic_2024}). Although some islands are more isolated than others, there is gene flow between all of them through dispersal (\cite{ranke_spatial_2021}), as illustrated in Figure~\ref{fig:dispersal on the map}. The resulting dataset combines genomic data with phenotypic and environmental observations, enabling the prediction of individual dispersal phenotypes and the estimation of their heritable component.
+
+% image of map fo area
+\begin{figure}
+    \centering
+    \includegraphics[width=0.8\linewidth]{Figures/Methods/Dispersal (ranke).png}
+    \caption[Map of study area]{Map of the study area. Inner islands are in yellow, and outer islands are in blue. The arrows display emigration patterns in the period $1993-2014$. Increased thickness of the arrows indicates a larger volume of emigration (\cite{ranke_spatial_2021}).}
+    \label{fig:dispersal on the map}
+\end{figure}
+
+
+\subsection{Response Variables}
+
+The primary response variable is natal dispersal, defined as whether an individual recruited on a different island than the one it hatched on. This is recorded as a binary phenotype ($y = 1$ for dispersers, $y = 0$ for non-dispersers) at the point of recruitment. Breeding dispersal, moving between breeding seasons after first recruitment, is negligible in this system, occurring in fewer than $0.02\%$ of individuals (\cite{saatoglu_genetic_2024}), meaning that the dispersal phenotype effectively captures a single, discrete life-history decision. This trait is the focus of the main analyses: model comparison between binary and Gaussian BPCRR formulations, and estimation of individual breeding values for dispersal.
+
+The secondary response variable is autumn dispersal, which captures whether an individual had already moved from its natal island by the time of autumn observations, prior to recruitment. This is a biologically distinct phenomenon from natal dispersal: it is observed at the nestling stage, before the individual has survived to recruit, and therefore captures early-life dispersal events that are invisible to the primary phenotype, since having a recorded dispersal phenotype includes survival through the first year (recruitment). Critically, individuals that disperse in autumn but die before recruiting are assigned $y = 1$ for autumn dispersal but receive no dispersal phenotype in the main dataset. This trait was not used for model comparison, but was included in analyses evaluating the robustness of the estimated breeding values.
+
+\subsection{Genomic and Environmental Data}
+
+For each individual, a blood sample was collected for DNA extraction and genotyping, yielding $M = 65\,244$ SNPs per individual. In addition to the genomic data, a set of environmental covariates was recorded for each individual, as listed in \autoref{tab:environmental covariates}. The dataset spans yearly observations from $1993$ to $2019$, and contains $N = 4722$ unique individuals with a recorded dispersal phenotype, of which $1106$ ($23\%$) dispersed. An additional $4306$ individuals did not recruit and therefore have no dispersal phenotype, but are retained in the dataset for the down stream analysis. For the autumn dispersal trait, the phenotype was recorded for a subset of $1142$ nestlings from $2007$--$2014$ for which both nest observations and autumn observations were available in the same year. Among these, $105$ ($9\%$) had dispersed by autumn, of 
+whom $50$ did not subsequently recruit.
+
+%table of environmental components
+\begin{table}[h!]
+\centering
+\caption{Environmental features included in the dataset.}
+\vspace{6pt}
+\label{tab:environmental covariates}
+\begin{tabular}{ll}
+\hline
+\textbf{Feature} & \textbf{Description} \\
+\hline
+Ringnr        & Unique individual identifier \\
+HatchYear     & Year the individual hatched \\
+Natal Island  & Island where the individual hatched \\
+Adult Island  & Island of recruitment  \\
+Sex           & Sex of the individual  \\
+Recruit       & Survival to recruitment \\
+$\text{F}_\text{ROH}$  & Inbreeding coefficient \\
+\hline
+\end{tabular}
+\end{table}
+
+%It should be noted that $115$ individuals in the dataset originated from Vega, an island outside the core study area. Because Vega is not part of the monitored meta-population, only individuals that dispersed from Vega into the Helgeland system 
+are present in the dataset. This means the Vega subsample consists exclusively of dispersers ($y = 1$), and is therefore not a representative sample of the Vega population. 
+%The implications of this for the analyses are described in 
+%Section~\ref{sec:data_subsets}.
+
+
+\subsection{Data Subsets}
+\label{sec:data_subsets}
+
+Before fitting the empirical models, the dataset was examined to identify individuals 
+whose dispersal status was not directly comparable to the within-system dispersal 
+phenotype. A total of $115$ individuals originated from Vega, an island outside the 
+core study area, and as described in Section~\ref{sec:genomic_data}, this subsample 
+consists exclusively of dispersers and is not representative of the Vega population. 
+To avoid this bias influencing model evaluation, these individuals were excluded from 
+the reduced dataset used in the main analyses. This exclusion was applied to the 
+comparison of the binomial and Gaussian BPCRR models, the comparison with the 
+Bayesian animal model, and the ranking-based model comparisons.
+
+For analyses where the goal was not model evaluation but rather the generation of 
+breeding value predictions for all available individuals, the excluded individuals 
+were re-included. This full dataset was used solely for the downstream prediction of 
+breeding values, which form the basis for analyses conducted outside the scope of 
+this thesis.
+
+%The autumn dispersal dataset, was used exclusively as a tool for evaluating the robustness of the breeding values estimated from the primary dispersal trait. Specifically, it was used to assess whether breeding values estimated from natal dispersal are predictive of autumn dispersal status, contributing to a broader investigation of the relationship between dispersal breeding values and fitness-related outcomes.
+
 
 
 \section{Statistical Models}\label{sec:stat_mod}
@@ -135,7 +208,7 @@ This scaling preserves the relative variance explained by the PCs, while avoidin
 The PC effects were assigned a common Gaussian prior,
 %
 \[
-u_k^\star \mid \sigma_u^2 \sim N(0, \sigma_u^2),
+u_k^\star \mid \sigma_{u_k}^2 \sim N(0, \sigma_{u_k}^2),
 \qquad k = 1,\ldots,K ,
 \]
 %
@@ -152,11 +225,12 @@ A suitable value for $\sigma_u^2$ was obtained by relating the variance of the P
 %
 Equating this expression to an additive genetic variance $V_A$ gave
 %
-\[
+\begin{equation}
 \sigma^2_u =
 \frac{V_A}
 {\sum_{k=1}^K \mathrm{Var}(\mathbf{Z}_k^\star)} .
-\]
+\label{eq:scaling_sigma_u}
+\end{equation}
 %
 This expressed the additive genetic variance on the PC-effect scale. %In contrast to assigning the same variance directly to individual SNP effects, this calibration used the variance represented by the orthogonal PCs included in the model, and therefore avoided assuming independence between markers.
 
@@ -189,11 +263,10 @@ When an initial or target value for the additive genetic variance was used, this
 \[
 \tau_a = \frac{1}{V_A}.
 \]
-%
-In the empirical analyses, the previous dispersal estimate from the same study population, $V_A = 0.448$ \parencite{saatoglu_genetic_2024}, was used to initialize the genetic precision parameter. This value was used only for initialization. The genetic variance component was estimated from the data, with a penalized-complexity prior assigned to the corresponding precision parameter.
+In the empirical analyses, the previous dispersal estimate from the same study population, $V_A = 0.448$ \parencite{saatoglu_genetic_2024}, was used to initialize the genetic precision parameter. This value was used only for initialization. The genetic variance component was estimated from the data, with a penalized-complexity prior assigned to the corresponding precision parameter. The PCa was done with PLINK version $1.9$, and the Van Raden GRM was computed in R. 
 
 
-Both representations were fitted within a Bayesian framework using INLA 
+%Both representations were fitted within a Bayesian framework using INLA 
 (\cite{rue_approximate_2009, martino_integrated_2019}), which provides approximations to the posterior distributions of the latent random effects. Since the breeding values were included as random effects, the estimated breeding values were obtained as the posterior means of their corresponding marginal posterior distributions.
 
 \section{Model Evaluation}\label{sec:model_eval}
@@ -202,7 +275,7 @@ Model evaluation was based on predictive performance, rank-based agreement betwe
 
 \subsection{Predictive Performance}
 
-Predictive performance for binary responses was evaluated using the area under the precision-recall curve (PR-AUC). This metric was used instead of the more commonly used area under the receiver operating characteristic curve (ROC-AUC), since ROC-AUC can give an overly optimistic impression of predictive performance when the response classes are imbalanced (KILDE). PR-AUC was therefore used as the main measure of predictive performance on the observed response scale.
+Predictive performance for binary responses was evaluated using the area under the precision-recall curve (PR-AUC). This metric was used instead of the more commonly used area under the receiver operating characteristic curve (ROC-AUC), since ROC-AUC can give an overly optimistic impression of predictive performance when the response classes are imbalanced (\cite{saito_precisionrecall_2015}). PR-AUC was therefore used as the main measure of predictive performance on the observed response scale.
 
 For binomial models, PR-AUC was computed using the estimated probabilities, $\hat{\mathbf{p}}$, as prediction scores. For linear models fitted to binary responses, PR-AUC was computed using the predicted linear scores, $\hat{\mathbf{y}}$, as prediction scores. Thus, both model formulations were evaluated on their ability to rank individuals according to the observed binary response, even though the predicted quantities were on different scales.
 
@@ -242,62 +315,10 @@ For models where individual breeding values were estimated from posterior distri
 
 % For evaluations where the aim was to assess the predictive value of estimated breeding values, cross-validation was used. In each fold, the model was fitted using the training individuals, and breeding values were predicted for individuals in the held-out fold. Predictive performance was then evaluated by computing PR-AUC using the held-out breeding value predictions as prediction scores.
 
-\section{Data Description}
-
-The data motivating this project come from a meta-population of Norwegian house sparrows on an island system off the coast of Helgeland. The meta-population spans 18 islands. These islands are divided into two main habitats: the \textit{inner islands}, closer to the mainland, and the \textit{outer islands}, further from the mainland. Some islands are more isolated, but there is genetic flow (dispersal) between all of them (\cite{ranke_spatial_2021}), as shown in Figure \ref{fig:dispersal on the map}. 
-
-The data include a binary dispersal indicator ($ 0/1$), $M = 65$ $244$ SNP markers per individual, and additional environmental features. The environmental features are displayed in \autoref{tab:environmental covariates}. The dataset consists of yearly measurements collected from $1998$ to $2019$, and contains $N = 4722$ unique individuals, of which $1106$ dispersed. In addition, the dataset contains $4306$ individuals that did not recruit, and therefore do not have a dispersal phenotype ($0/1$).  
-
-%table of environmental components
-\begin{table}[h!]
-\centering
-\caption{Environmental features included in the dataset.}
-\vspace{6pt}
-\label{tab:environmental covariates}
-\begin{tabular}{ll}
-\hline
-\textbf{Feature} & \textbf{Description} \\
-\hline
-Ringnr        & Unique individual identifier \\
-HatchYear     & Year the individual hatched \\
-Natal Island  & Island where the individual hatched \\
-Adult Island  & Island of recruitment  \\
-Sex           & Sex of the individual  \\
-Recruit       & Survival to recruitment \\
-$\text{F}_\text{ROH}$         & Inbreeding coefficient \\
-\hline
-\end{tabular}
-\end{table}
-
-
-% image of map fo area
-\begin{figure}
-    \centering
-    \includegraphics[width=0.8\linewidth]{Figures/Methods/Dispersal (ranke).png}
-    \caption[Map of study area]{Map of the study area. Inner islands are in yellow, and outer islands are in blue. The arrows display emigration patterns in the period $1993-2014$. Increased thickness of the arrows indicates a larger volume of emigration (\cite{ranke_spatial_2021}).}
-    \label{fig:dispersal on the map}
-\end{figure}
-
-In addition to the main dispersal dataset, a second dataset was used to estimate breeding values for autumn dispersal. This dataset was based on the previous dataset, but now the trait of interest is autumn dispersal. Within this dataset, the autumn dispersal phenotype was available for a subset of $1142$ nestlings from the years $2007$--$2014$ for which both nest observations and autumn observations were recorded in the same year. The remaining individuals did not have a recorded autumn dispersal phenotype and were therefore treated as missing for this trait during model fitting, but breeding values were still predicted for them.
-
-The autumn dispersal phenotype, indicates whether an individual had dispersed from its natal island by autumn. Among the $1142$ individuals with recorded autumn dispersal status, $105$ had dispersed by autumn, and $50$ of these did not recruit the following year. This phenotype therefore captures dispersal events that occurred before recruitment, including dispersal among individuals that would not have received a dispersal phenotype in the main dataset.
-
-\subsection{Data Subsets used in the Empirical Analysis}
-
-% say that a reduced dataset was used for the assesment of the model performance, and that the full dataset, and the autumn dispersal data was used for the Robustness of the estimted BVs. 
-
-Before fitting the empirical models, the dispersal dataset was examined to identify individuals whose dispersal status was not directly comparable to the main within-system dispersal phenotype. A total of $115$ individuals had dispersed into the Helgeland system from outside the study system, mostly from Vega but also from other islands. These individuals all had an observed dispersal phenotype of $y = 1$, meaning that this group provided no variation with respect to the trait. This group if individuals is therefor a biased sample from this island, and will not be representative for the whole population on this island. As a consequence of this bias, we decided to exclude these individuals when assessing model performance and ranking in the main analysis. 
-
-%Since natal island was included as an environmental random effect and is known to influence dispersal (KILDE PÅ DET!), these individuals were excluded from both model fitting and model evaluation in the main empirical analyses of the dispersal trait.
-
-This exclusion was applied to the analyses comparing the binomial and Gaussian BPCRR models, the comparison with the Bayesian animal model, and the ranking-based model comparisons. The excluded individuals were included again when breeding values were generated for downstream analyses. In this setting, the aim was not to evaluate model performance for the main dispersal phenotype, but to obtain breeding value predictions for the available individuals.
-
-The autumn dispersal dataset was used only for analyses relevant to the downstream use of the estimated breeding values. Therefore, the autumn dispersal trait was included in the selection of the number of principal components and in the 10-fold cross-validation used to assess whether the estimated breeding values predicted dispersal.
 
 \section{Simulations}
 
-This simulation study was designed to evaluate how BPCRR performs for binary traits when the observation model is either correctly specified as binomial or approximated by a linear model. Since BPCRR represents the marker-based genetic signal through a reduced set of principal components, the simulations also allowed us to investigate how model performance depends on the number of PCs included in the fitted model. Binary phenotypes were generated under a known marker-based genetic architecture across different heritability levels, making it possible to assess both predictive performance and recovery of the underlying genetic signal.
-
+This simulation study was designed to evaluate how BPCRR performs for binary traits when the observation model is either correctly specified as binomial or approximated by a linear model. Since BPCRR represents the marker-based genetic signal through a reduced set of principal components, the simulations also allowed us to investigate how model performance depends on the number of PCs included in the fitted model. Binary phenotypes were generated under a known marker-based genetic architecture across different latent heritability levels, making it possible to assess both predictive performance and recovery of the underlying genetic signal.
 We first describe how the binary phenotypes were simulated. We then describe how the binomial and Gaussian BPCRR models were fitted, before presenting the experimental setup and evaluation metrics used to compare the models.
 
 \subsection{Simulation of Phenotypes}
@@ -325,28 +346,30 @@ The marker effects $\mathbf{u}$ were simulated using a BayesR-type mixture distr
 %
 \begin{equation*}
 \label{eq:sim_marker_effects}
-u_m \sim \pi_1 \cdot 0 + (1-\pi_1) \cdot N(0,\sigma^2), \qquad m = 1, 2, \dots, M \ .
+u_m \sim \pi_1 \cdot 0 + (1-\pi_1) \cdot N(0,\sigma_u^2), \qquad m = 1, 2, \dots, M \ ,
 \end{equation*}
 %
-This induces a sparse genetic architecture, where many SNPs have no effect on the trait, while a subset of SNPs contribute to the additive genetic signal.
+which induces a sparse genetic architecture, where many SNPs have no effect on the trait, while a subset of SNPs contribute to the additive genetic signal.
 
 Next, the vector of breeding values $\mathbf{a}$ was centered to have mean zero and scaled to achieve a target additive genetic variance, $\mathrm{Var}(\mathbf{a}) = V_A$. Because phenotypes were generated under a logit link, the target additive variance was defined on the latent liability scale using the logistic residual variance $V_{\text{link}} = \pi^2/3$. For a desired latent heritability $h^2_l$, the additive variance was therefore set to
 %
-$$
-V_A = \frac{h^2_l \cdot \pi^2/3}{1 - h^2_l} \ .
-$$
+\begin{equation}
+    V_A = \frac{h^2_l \cdot \pi^2/3}{1 - h^2_l} \ .
+    \label{eq:VA_vs_heritability}
+\end{equation}
+
 %
-Centering $\mathbf{a}$ implies a zero intercept, corresponding to an expected phenotype probability of $0.5$. The centered and scaled breeding values were then transformed to individual success probabilities using the inverse logit link function,
+Centering $\mathbf{a}$ implies a zero intercept, corresponding to an expected phenotype probability of $0.5$. The centered and scaled breeding values were then transformed to individual success probabilities using the inverse logit link function, 
 %
 \begin{equation}
 \label{eq:sim_prob}
-\mathbf{p} = \text{logit}^{-1}(\mathbf{a}) = \frac{e^{\mathbf{a}}}{1 + e^{\mathbf{a}}} \ .
+\mathbf{p} = \text{logit}^{-1}(\mathbf{a}) = \frac{e^{\mathbf{a}}}{1 + e^{\mathbf{a}}} \ ,
 \end{equation}
 %
-Binary phenotypes were subsequently sampled as
 \[
-\mathbf{y} \sim \text{Bernoulli}(\mathbf{p}) \ .
+\mathbf{y} \sim \text{Bernoulli}(\mathbf{p}) \ ,
 \]
+where $\mathbf{y}$ is the simulated $0/1$ binary phenotype. 
 
 
 % TODO: Legg inn setning med hvilke h^2-nivåer som simuleres.
@@ -375,15 +398,15 @@ A summary of the phenotype-generating procedure is given in Algorithm~\ref{alg:s
 
 \subsection{Model Formulation}
 
-The simulated binary phenotypes were analysed using both the binomial model and the linear model. The purpose was to compare model performance when the fitted model either matched or did not match the phenotype-generating model. Since the phenotypes were generated from a Bernoulli distribution under a logit link, the binomial model represents the correctly specified observation model, whereas the linear model represents an approximation in which the binary response is analysed on the observed $0/1$ scale.
+The simulated binary phenotypes were analysed using both the binomial model and the linear approximation defined in equation \eqref{eq:method_gauss_mod_matrix}, where we assume a linear relationship between the response and the covariates. The purpose was to compare model performance when the fitted model either matched or did not match the phenotype-generating model. Since the phenotypes were generated from a Bernoulli distribution under a logit link, the binomial model represents the correctly specified observation model, whereas the linear model represents an approximation in which the binary response is analysed on the observed $0/1$ scale.
 
-In both fitted models, the additive genetic component was represented using a marker-based principal component approach. The genetic effect was represented through principal components derived from the SNP matrix. Let $\mathbf{Z}^\star$ denote the matrix containing the principal components. The genetic component was then modeled as
+In both fitted models, the additive genetic component was represented using a marker-based principal component approach defined in equation \eqref{eq:PC_representation} . The genetic effect was represented through principal components derived from the SNP matrix. Let $\mathbf{Z}^\star$ denote the matrix containing the principal components. The genetic component was then modeled as
 %
 \[
-\mathbf{a} = \mathbf{Z}^\star_{K}\boldsymbol{u}^\star,
+\mathbf{a^\star} = \mathbf{Z}^\star_{K}\boldsymbol{u}^\star,
 \]
 %
-where $\boldsymbol{u}^\star$ denotes the vector of PC-effects, and $\mathbf{Z}_K^\star$ represents the $K$ first PCs from the PC-matrix $\mathbf{Z}^\star$. In this simulation study, the fitted genetic component $\mathbf{\hat{a}}$ represents the estimated breeding values.
+where $\boldsymbol{u}^\star$ denotes the vector of PC-effects, and $\mathbf{Z}_K^\star$ represents the $K$ first PCs from the PC-matrix $\mathbf{Z}^\star$. In this simulation study, the fitted genetic component $\mathbf{a^\star}$ represents the estimated breeding values.
 
 
 % TODO: Add a more specific explanation if needed, for example why the GRM-based animal model was not included in this simulation study.
@@ -393,69 +416,83 @@ where $\boldsymbol{u}^\star$ denotes the vector of PC-effects, and $\mathbf{Z}_K
 For the binomial model, the simulated phenotypes were fitted using the binomial formulation described in Equations~\eqref{eq:method_bin_lin_pred} and~\eqref{eq:bin_prob}. In the simulation setting, the fitted linear predictor consisted of an intercept and the PC-based genetic component,
 %
 \[
-\boldsymbol{\eta}= \beta_0 \mathbf{1}_N + \mathbf{a},
+\hat{\boldsymbol{\eta}}= \hat{\beta_0} \mathbf{1}_N + \mathbf{a}^\star_l,
 \]
 %
-where $\beta_0$ is the intercept and $\mathbf{a}$ is the PC-based additive genetic effects. The expected response is the probability of success,
+where $\beta_0$ is the intercept and $\mathbf{a}^\star_l$ is the PC-based additive genetic effects on the latent scale. The expected response is the probability of success,
 %
-\[\mathbf{p} = \mathrm{logit}^{-1}(\boldsymbol{\eta}).
+\[\hat{\mathbf{p}} = \mathrm{logit}^{-1}(\boldsymbol{\hat{\eta}}).
 \]
 %
 This model corresponds to fitting the same type of observation model as was used to generate the binary phenotypes.
 
 \subsubsection*{Gaussian BPCRR Model Formulation}
 
-For the linear model, the same simulated binary phenotypes were analysed using the linear model formulation introduced in Equation~\eqref{eq:method_lin_mod}. The binary response was treated as a continuous response on the observed $0/1$ scale, with model
+For the linear model, the same simulated binary phenotypes were analyzed using the linear model formulation introduced in Equation~\eqref{eq:method_gauss_mod_matrix}. The binary response was treated as a continuous response on the observed $0/1$ scale, with model
 %
 \[
-\mathbf{y} = \beta_0\mathbf{1}_N + \mathbf{a} + \boldsymbol{\varepsilon},
+\hat{\mathbf{y}} = \hat{\beta_0}\mathbf{1}_N + \mathbf{a}^\star_o + \boldsymbol{\varepsilon},
 \]
 %
-where $\beta_0$ is the intercept, $\mathbf{a}$ is the PC-based additive genetic effect, and $\boldsymbol{\varepsilon}$ is the residual error term. This model therefore uses the same representation of the additive genetic component as the binomial model, but differs in the assumed observation model and residual variance structure. we expect that this linear approximation will perform poorer than the binary formulation, because the model that generates the response is the same so the one we use to fit the model in the binary case. For the linear mode this is not the case. 
+where $\beta_0$ is the intercept, $\mathbf{a}^\star_o$ is the PC-based additive genetic effect on the observed scale, and $\boldsymbol{\varepsilon} \sim N(\mathbf{0}, \sigma_\varepsilon^2\mathbf{I)}$ is the residual error term. This model therefore uses the same representation of the additive genetic component as the binomial model, but differs in the assumed observation model and residual variance structure. we expect that this linear approximation will perform poorer than the binary formulation, because the model that generates the response is the same so the one we use to fit the model in the binary case. For the linear mode this is not the case. 
 
 \subsubsection*{Ridge Regression with Prior Calibrations}
 
-Both models were fitted using INLA, which requires the latent effects to be assigned prior distributions. For the PC-based genetic effects, this prior plays a role similar to the ridge penalty in the linear model, controlling the amount of shrinkage applied to the estimated effects. Since the simulated heritability level was known, the prior could be calibrated so that the PC-based genetic component was placed on the intended additive genetic variance scale. The target variance for this calibration was defined on the latent liability scale, as the binary phenotypes were generated under a logit-link model. Specifically, the logistic residual variance was defined as
-\[
-V_{\text{link}} = \frac{\pi^2}{3}.
-\]
-For a desired latent heritability $h^2_l$, the corresponding additive genetic variance was then computed as
-\[
-V_A = \frac{h^2_l V_{\text{link}}}{1 - h^2_l}
-    = \frac{h^2_l \cdot \pi^2/3}{1 - h^2_l}.
-\]
-
-The prior variance was chosen by matching the expected prior variance of the PC-based genetic component to the target additive variance $V_A$. Conditional on a PC-effect $u_k^\star$, the contribution from the $k$th component has variance $(u_k^\star)^2\mathrm{Var}(\mathbf{Z}_k^\star)$ across individuals. Since $u_k^\star$ has prior mean zero and variance $\sigma_b^2$, the expected contribution is $\sigma_b^2\mathrm{Var}(\mathbf{Z}_k^\star)$. Orthogonality of the principal components removes covariance terms, giving
-\[
-\mathbb{E}\left[\mathrm{Var}(\mathbf{Z}^\star \mathbf{u}^\star)\right]
-=
-\sigma_b^2 \sum_{k=1}^K \mathrm{Var}(\mathbf{Z}_k^\star).
-\]
-Equating this expression to $V_A$ yields
-\[
-\sigma_b^2 = \frac{V_A}{\sum_{k=1}^K \mathrm{Var}(\mathbf{Z}_k^\star)}.
-\]
-Thus, the prior specification for the binary model was expressed through the fixed precision $\tau_b = 1/\sigma_b^2$, with $\sigma_b^2$ chosen to match the expected prior variance of the PC-based genetic component to the target latent-scale additive variance.
+In this simulation setting the prior calibrations was done knowing the true underlying genetic signal. Since the simulated latent heritability level was known, the prior could be calibrated so that the PC-based genetic component in the binary model formulation was placed on the intended additive genetic variance scale. The target additive genetic variance on the latent scale $V_{A,l}$ from \eqref{eq:VA_vs_heritability}, and the prior latent variance was chosen by matching the expected prior variance of the PC-based genetic component $V_{A, l}^\star =$Var$(\mathbf{a}^\star_l)$ to the target additive genetic variance $V_{A, l}$ as shown in \eqref{eq:scaling_sigma_u}. For the binary model the prior specification on the PC-effects on the latent scale was 
+%
+$$
+\sigma_{u_k, l}^2 = \frac{V_{A,l}}{\sum_{k=1}^K \mathrm{Var}(\mathbf{Z}_k^\star)} \ .
+$$
+The corresponding fixed precision was
+\(
+\tau_l = 1/\sigma_{u_k,l}^2.
+\)
 
 
-For the linear model, the prior calibration was performed on the observed response scale rather than on the latent liability scale. The linear model treats the binary phenotype as a continuous $0/1$ response and uses an identity link, so the PC-based genetic component is estimated on the same scale as the observed phenotype. The latent-scale additive variance $V_A$ was therefore not used directly. Instead, the target additive variance for the Gaussian prior was defined as the variance of the true simulated probabilities,
-\[
-V_{A,o} = \mathrm{Var}(\mathbf{p}_{\mathrm{true}}),
-\]
-where $\mathbf{p}_{\mathrm{true}}$ denotes the probabilities obtained by applying the inverse logit function to the simulated breeding values.
-On the observed response scale, these probabilities represent the expected phenotype values implied by the simulated genetic signal. Their empirical variance was therefore used as the observed-scale analogue of the additive genetic variance.
 
-The prior variance for the PC effects in the linear model was then calibrated by matching the expected prior variance of the PC-based genetic component to the observed-scale target variance $V_{A,o}$. Using the same variance decomposition as above, this gave
+%The additive genetic variance $V_A$ is set from the desired level of latent heritability, and we use these known values when setting the priors on the PC effects $\mathbf{u}^\star$. For the binary BPCRR model we used the $V_A$ from equation \eqref{eq:VA_vs_heritability} in equation \eqref{eq:scaling_sigma_u} to set the variance of the PC effects to match the desired heritability
+
+%Both models were fitted using INLA, which requires the  effects to be assigned prior distributions. For the PC-based genetic effects, this prior plays a role similar to the ridge penalty in the linear model, controlling the amount of shrinkage applied to the estimated effects. Since the simulated heritability level was known, the prior could be calibrated so that the PC-based genetic component was placed on the intended additive genetic variance scale. The target variance for this calibration was defined on the latent liability scale, as the binary phenotypes were generated under a logit-link model. Specifically, the logistic residual variance was defined as
+% \[
+% V_{\text{link}} = \frac{\pi^2}{3}.
+% \]
+% For a desired latent heritability $h^2_l$, the corresponding additive genetic variance was then computed as
+% \[
+% V_A = \frac{h^2_l V_{\text{link}}}{1 - h^2_l}
+%     = \frac{h^2_l \cdot \pi^2/3}{1 - h^2_l}.
+% \]
+
+%The prior variance was chosen by matching the expected prior variance of the PC-based genetic component to the target additive variance $V_A$. Conditional on a PC-effect $u_k^\star$, the contribution from the $k$th component has variance $(u_k^\star)^2\mathrm{Var}(\mathbf{Z}_k^\star)$ across individuals. Since $u_k^\star$ has prior mean zero and variance $\sigma_b^2$, the expected contribution is $\sigma_b^2\mathrm{Var}(\mathbf{Z}_k^\star)$. Orthogonality of the principal components removes covariance terms, giving
+% \[
+% \mathbb{E}\left[\mathrm{Var}(\mathbf{Z}^\star \mathbf{u}^\star)\right]
+% =
+% \sigma_b^2 \sum_{k=1}^K \mathrm{Var}(\mathbf{Z}_k^\star).
+% \]
+% Equating this expression to $V_A$ yields
+% \[
+% \sigma_b^2 = \frac{V_A}{\sum_{k=1}^K \mathrm{Var}(\mathbf{Z}_k^\star)}.
+% \]
+% Thus, the prior specification for the binary model was expressed through the fixed precision $\tau_b = 1/\sigma_b^2$, with $\sigma_b^2$ chosen to match the expected prior variance of the PC-based genetic component to the target latent-scale additive variance.
+
+
+For the linear model, the prior calibration was performed on the observed response scale rather than on the latent liability scale. The linear model treats the binary phenotype as a continuous $0/1$ response and uses an identity link, so the observed scale PC-based genetic component $\mathbf{a}^\star_o$ is estimated on the same scale as the observed phenotype. The latent-scale additive variance $V_{A,l}$ was therefore not used directly. Instead, the target additive variance for $\mathbf{a}^\star_o$ was defined as the variance of the true simulated probabilities,
+\[
+V_{A,o} = \mathrm{Var}(\mathbf{p}),
+\]
+where $\mathbf{p}$ denotes the probabilities obtained by applying the inverse logit function to the simulated breeding values.
+On the observed response scale, these probabilities represent the expected phenotype values implied by the simulated genetic signal. Their empirical variance $V_{A,o}$ was therefore used as the observed-scale analogue of the additive genetic variance.
+
+The prior variance for the PC effects in the linear model was then calibrated by matching the expected prior variance of the PC-based genetic component $V_{A,o}^\star$ to the observed-scale target variance $V_{A,o}$. Using equation \eqref{eq:scaling_sigma_u}
 %
 \[
-\sigma_o^2 = \frac{V_{A,o}}{\sum_{k = 1}^K \mathrm{Var}(\mathbf{Z}^\star_k)} \ ,
+\sigma_{u_k,o}^2 = \frac{V_{A,o}}{\sum_{k = 1}^K \mathrm{Var}(\mathbf{Z}^\star_k)} \ ,
 \]
 %
-where $\sigma_o^2$ denotes the common prior variance assigned to the PC effects on the observed response scale. The corresponding fixed precision used in the INLA specification was therefore set to
+where $\sigma_{u_ko}^2$ denotes the common prior variance assigned to the PC effects on the observed response scale. The corresponding fixed precision used in the INLA specification was therefore set to
 \(
 \tau_o = 1/\sigma_o^2.
 \)
-This ensured that the prior scale of the PC-based genetic component matched the scale of the fitted Gaussian response.
+This ensured that the prior scale of the PC-based genetic component matched the scale of the fitted linear response.
 
 
 In summary, both the binomial and linear models were fitted using the same PC-based representation of the genetic component, but with prior calibrations matched to the scale of each observation model. For the binomial model, the PC-effect prior was calibrated using the target additive variance on the latent liability scale, whereas for the linear model it was calibrated using the observed-scale variance of the true simulated probabilities. From each fitted model, posterior summaries of the PC-based genetic component were extracted and used as estimated breeding values in the subsequent evaluation.
@@ -472,7 +509,9 @@ K \in \{100, 200, \dots, 1500\},
 \]
 where $K$ denotes the number of PCs included in the genetic component.
 
-The marker effects in the phenotype-generating model were simulated from the sparse mixture distribution described above, using $\pi_1 = 0.95$ and non-zero effect variance $\sigma^2 = 10^{-4}$. For each heritability level, the simulation and model-fitting procedure was repeated $10$ times. In each replicate, an $80/20$ stratified train-test split was used, preserving the proportion of cases and controls in both sets. The same split was used for the binomial and Gaussian BPCRR models to allow paired comparison of model performance.
+The marker effects in the phenotype-generating model were simulated from the sparse mixture distribution described above, using $\pi_1 = 0.95$ and non-zero effect variance $\sigma^2 = 10^{-4}$. For each heritability level, the simulation was done twice and model-fitting procedure was repeated $10$ times for each simulated dataset. In each replicate, an $80/20$ stratified train-test split was used, preserving the proportion of cases and controls in both sets. The same split was used for the binomial and linear BPCRR models to allow paired comparison of model performance.
+
+Model performance was evaluated using PR-AUC, Spearman rank correlation, and recovered additive genetic variance, as described in Section~\ref{sec:model_eval}. Although the simulated datasets were balanced by construction, PR-AUC was used throughout to maintain consistency with the empirical analyses where class imbalance is present. For reference, PR-AUC was also computed using the true simulated probabilities as prediction scores, giving upper-bound values of $0.64$, $0.71$, and $0.78$ for $h^2_l = 0.1$, $0.2$, and $0.33$, respectively.
 
 All models were fitted using INLA. Posterior summaries of the PC-based genetic component were extracted from each fitted model and used as estimated breeding values. Model performance was then evaluated on the test set using predictive performance, rank recovery of the true breeding values, and recovery of the additive genetic variance. A summary of the numerical settings used in the simulation study is given in Table~\ref{tab:simulation_settings}.
 
@@ -498,23 +537,23 @@ Number of samples to estimate $\hat{V_A}$ & 200 \\
 \end{tabular}
 \end{table}
 
-\subsection{Evaluations}
+% \subsection{Evaluations}
 
-Model performance in the simulation study was evaluated using three performance metrics, PR-AUC, Spearman correlation and the recovered additive genetic variance. The evaluation was carried out across the three simulated heritability levels and for different numbers of principal components included in the fitted models. For each simulated dataset, an $80/20$ stratified train/test split was implemented, such that the proportion of individuals with $y = 1$ was approximately preserved in both the training and test sets. This procedure was repeated $10$ times. 
+% Model performance in the simulation study was evaluated using three performance metrics, PR-AUC, Spearman correlation and the recovered additive genetic variance. The evaluation was carried out across the three simulated heritability levels and for different numbers of principal components included in the fitted models. For each simulated dataset, an $80/20$ stratified train/test split was implemented, such that the proportion of individuals with $y = 1$ was approximately preserved in both the training and test sets. This procedure was repeated $10$ times. 
 
-% PR-AUC
-Predictive performance on the observed response scale was evaluated using the area under the precision-recall curve (PR-AUC). This metric was chosen instead of the more commonly used area under the receiver operating characteristic curve (ROC-AUC), since ROC-AUC can provide an overly optimistic assessment of predictive performance in the presence of class imbalance (KILDE). Although the simulated datasets were balanced, PR-AUC was used throughout the simulation study to maintain consistency with the later analyses, where the observed data exhibit class imbalance.
-For reference, PR-AUC was also computed using the true simulated probabilities as prediction scores. These values represent the performance attainable when predictions are based on the true probabilities. For the three simulated heritability levels $h^2 = 0.1$, $0.2$, and $0.33$, the corresponding reference PR-AUC values were $0.64$, $0.71$, and $0.78$, respectively. 
+% % PR-AUC
+% Predictive performance on the observed response scale was evaluated using the area under the precision-recall curve (PR-AUC). This metric was chosen instead of the more commonly used area under the receiver operating characteristic curve (ROC-AUC), since ROC-AUC can provide an overly optimistic assessment of predictive performance in the presence of class imbalance (KILDE). Although the simulated datasets were balanced, PR-AUC was used throughout the simulation study to maintain consistency with the later analyses, where the observed data exhibit class imbalance.
+% For reference, PR-AUC was also computed using the true simulated probabilities as prediction scores. These values represent the performance attainable when predictions are based on the true probabilities. For the three simulated heritability levels $h^2 = 0.1$, $0.2$, and $0.33$, the corresponding reference PR-AUC values were $0.64$, $0.71$, and $0.78$, respectively. 
 
-%Correlation
-The estimated breeding values from the Gaussian and binomial models are not expected to be on the same scale. We therefore evaluated their ability to rank individuals rather than comparing their absolute values directly. Specifically, we assessed the association between the true and estimated breeding values using a rank-based correlation. This avoids penalizing the linear model solely for producing breeding values on a different scale than the binomial model. The rank-based correlation was computed as
-\[
-\rho_{\mathrm{rank}} = \mathrm{Corr}\left(\mathrm{rank}(\mathbf{a}), \mathrm{rank}(\hat{\mathbf{a}})\right) \ ,
-\]
-where $\mathbf{a}$ denotes the true simulated breeding values and $\hat{\mathbf{a}}$ denotes the estimated breeding values. This metric therefore measures whether individuals with low and high true breeding values are assigned a similar relative ordering based on the estimated breeding values.
+% %Correlation
+% The estimated breeding values from the Gaussian and binomial models are not expected to be on the same scale. We therefore evaluated their ability to rank individuals rather than comparing their absolute values directly. Specifically, we assessed the association between the true and estimated breeding values using a rank-based correlation. This avoids penalizing the linear model solely for producing breeding values on a different scale than the binomial model. The rank-based correlation was computed as
+% \[
+% \rho_{\mathrm{rank}} = \mathrm{Corr}\left(\mathrm{rank}(\mathbf{a}), \mathrm{rank}(\hat{\mathbf{a}})\right) \ ,
+% \]
+% where $\mathbf{a}$ denotes the true simulated breeding values and $\hat{\mathbf{a}}$ denotes the estimated breeding values. This metric therefore measures whether individuals with low and high true breeding values are assigned a similar relative ordering based on the estimated breeding values.
 
-% Recovered additive genetic variance 
-Lastly, to evaluate the model's ability to recover the correct additive genetic variance, posterior samples of the individual breeding values were obtained from the BPCRR model. The estimated variance $\hat{V}_A$ is the mean of the posterior distribution of $\mathrm{Var}(\hat{a}_i)$, obtained by sampling from this distribution.  
+% % Recovered additive genetic variance 
+% Lastly, to evaluate the model's ability to recover the correct additive genetic variance, posterior samples of the individual breeding values were obtained from the BPCRR model. The estimated variance $\hat{V}_A$ is the mean of the posterior distribution of $\mathrm{Var}(\hat{a}_i)$, obtained by sampling from this distribution.  
 
 
 % comparing with aspheims formula
@@ -587,76 +626,87 @@ Following the simulation study, the BPCRR framework was applied to the empirical
 
 For all the empirical dispersal analyses, the model formulations were extended relative to the simulation setting. The empirical models included additional covariates to account for biological and sampling structure that may affect dispersal. Sex and inbreeding level were included as fixed effects, while hatch year and natal island were included as random effects. The same observation models and non-genetic effects were used across the empirical analyses, but the representation of the additive genetic component $\mathbf{a}$ differed between model types.
 
-Based on the general binomial formulation in Equations~\eqref{eq:method_bin_lin_pred} and~\eqref{eq:bin_prob}, the binomial model was specified as
+Based on the general binomial formulation in Equations~\eqref{eq:method_bin_lin_pred} 
+and~\eqref{eq:bin_prob}, the binomial model was specified as
 %
 \begin{align*}
-    \boldsymbol{\eta} &= \beta_0\mathbf{1}_N + \beta_{S}\mathbf{x}_{S} + \beta_{IB}\mathbf{x}_{IB}
-    + d_{0,HY}\mathbf{w}_{HY} + d_{0,NI}\mathbf{w}_{NI} + \mathbf{a} \ , \\
-    \mathbf{p} &= \text{logit}^{-1}(\boldsymbol{\eta}) \ ,
+    \hat{\boldsymbol{\eta}} &= \hat{\beta}_0\mathbf{1}_N + \mathbf{X}\hat{\boldsymbol{\beta}}
+    + \mathbf{W}\hat{\mathbf{d}}_0 + \hat{\mathbf{a}}_l \ , \\
+    \hat{\mathbf{p}} &= \text{logit}^{-1}(\hat{\boldsymbol{\eta}}) \ ,
 \end{align*}
 %
-where $\mathbf{x}_{S}$ is the covariate vector for sex, $\mathbf{x}_{IB}$ is the covariate vector for inbreeding, and $\mathbf{w}_{HY}$ and $\mathbf{w}_{NI}$ are design vectors for hatch year and natal island, respectively. The corresponding effects are given by $\beta_S$ and $\beta_{IB}$ for the fixed effects, and $d_{0,HY}$ and $d_{0,NI}$ for the hatch-year and natal-island random effects. The vector $\mathbf{a}$ denotes the additive genetic effects, and $\mathbf{p}$ is the vector of individual dispersal probabilities obtained by applying the inverse logit link function to the linear predictor.
+where $\hat{\beta}_0$ is the estimated intercept, $\mathbf{X}$ is the design matrix for sex and inbreeding as fixed effects, with corresponding estimated coefficients $\hat{\boldsymbol{\beta}}$, $\mathbf{W}$ is the design matrix for hatch year and natal island as random effects, with corresponding estimated coefficients $\hat{\mathbf{d}}_0$. The vector $\hat{\mathbf{a}}_l$ denotes the additive genetic component, represented either as the PC-based component following Equation~\eqref{eq:PC_representation}, or through the GRM-based animal model following Equation~\eqref{eq:grm_representation}. The vector $\hat{\mathbf{p}}$ is the vector of individual dispersal probabilities obtained by applying the inverse logit link function to the linear predictor.
 
-The corresponding linear model was specified using the same fixed and random effects, but with a Gaussian likelihood and identity link as in Equation~\eqref{eq:method_lin_mod}:
+The corresponding linear model was specified using the same fixed and random effects, 
+but with a Gaussian likelihood and identity link as in Equation~\eqref{eq:method_gauss_est_matrix}:
 %
 \begin{equation*}
-    \boldsymbol{y} = \beta_0\mathbf{1}_N + \beta_{S}\mathbf{x}_{S} + \beta_{IB}\mathbf{x}_{IB}
-    + d_{0,HY}\mathbf{w}_{HY} + d_{0,NI}\mathbf{w}_{NI} + \mathbf{a} + \boldsymbol{\varepsilon} \ ,
+    \hat{\mathbf{y}} = \hat{\beta}_0\mathbf{1}_N + \mathbf{X}\hat{\boldsymbol{\beta}}
+    + \mathbf{W}\hat{\mathbf{d}}_0 + \hat{\mathbf{a}}_o + \boldsymbol{\varepsilon} \ ,
 \end{equation*}
 %
-where $\boldsymbol{\varepsilon}$ denotes the residual error term, and $\mathbf{y}$ is the binary dispersal response treated as a continuous response. Thus, the binomial and linear models differed in their observation model, but used the same fixed effects, random effects, and additive genetic component.
+where $\boldsymbol{\varepsilon}$ denotes the residual error term, $\hat{\mathbf{a}}_o$ denotes 
+the additive genetic component, represented either as the PC-based component following 
+Equation~\eqref{eq:PC_representation}, or through the GRM-based animal model following 
+Equation~\eqref{eq:grm_representation}, and $\hat{\mathbf{y}}$ is the binary dispersal 
+response treated as a continuous response. Thus, the binomial and linear models differed 
+in their observation model, but used the same fixed effects, random effects, and additive 
+genetic component. 
 
-\subsection{Representations of the Additive Genetic Component}
+Unless otherwise stated, model performance was evaluated using repeated stratified $80/20$ train-test splits, preserving the proportion of dispersers in both sets. In each replicate, the model was fitted using the training set, and predictions were evaluated on the corresponding test set. The same splits were applied across models within each analysis to allow direct comparison. In the empirical analyses, the previous dispersal estimate from the same study population, $V_A = 0.448$ \parencite{saatoglu_genetic_2024}, was used to initialize the genetic precision parameter. This value was used only for initialization. The genetic variance component was estimated from the data, with a penalized-complexity prior assigned to the corresponding precision parameter. The PCa was done with PLINK version $1.9$, and the Van Raden GRM was computed in R. 
 
-The empirical models described above were fitted using two different representations of the additive genetic component $\mathbf{a}$. The fixed effects, non-genetic random effects, and observation models were kept the same, while the genetic component was represented either through principal components of the SNP matrix or through a genomic relationship matrix. This made it possible to compare the BPCRR approach with a standard genomic animal model under otherwise similar model specifications.
 
-In the BPCRR models, the additive genetic component was represented using the first $K$ principal components of the SNP matrix,
-%
-\[
-\mathbf{a} = \mathbf{Z}_K^\star \boldsymbol{u}^\star ,
-\]
-%
-where $\mathbf{Z}_K^\star$ contains the first $K$ principal components and $\boldsymbol{u}^\star$ denotes the corresponding vector of PC effects. The value of $K$ therefore controlled the dimension of the genetic component included in the model. The PC effects were assigned a common precision parameter, corresponding to a ridge-type shrinkage of the estimated effects.
+% \subsection{Representations of the Additive Genetic Component}
 
-In the genomic animal model, the additive genetic component was instead represented through the genomic relationship matrix. In this formulation, the breeding values were modelled as
-%
-\[
-\mathbf{a} \sim N(\mathbf{0}, \sigma_a^2 \mathbf{G}) ,
-\]
-%
-where $\mathbf{G}$ is the genomic relationship matrix and $\sigma_a^2$ is the additive genetic variance. In contrast to the BPCRR representation, this model does not include the marker-derived PCs as predictors directly. Instead, the marker information enters through the covariance structure of the breeding values, such that genetically similar individuals are expected to have more similar additive genetic effects.
+% The empirical models described above were fitted using two different representations of the additive genetic component $\mathbf{a}$. The fixed effects, non-genetic random effects, and observation models were kept the same, while the genetic component was represented either through principal components of the SNP matrix or through a genomic relationship matrix. This made it possible to compare the BPCRR approach with a standard genomic animal model under otherwise similar model specifications.
 
-For both the BPCRR and genomic animal models, the genetic variance component was estimated from the data. A previous dispersal estimate from the same study population, $V_A = 0.448$ \parencite{saatoglu_genetic_2024}, was used to initialize the genetic precision parameter in INLA. For the BPCRR models, this value was first transformed to the PC-effect variance scale as
-%
-\[
-\sigma^2_{u,\mathrm{init}} =
-\frac{V_A}{\sum_{k=1}^K \mathrm{Var}(\mathbf{Z}_k^\star)} ,
-\]
-%
-giving the corresponding initial precision
-%
-\[
-\tau_{u,\mathrm{init}} =
-\frac{1}{\sigma^2_{u,\mathrm{init}}}.
-\]
-%
-For the genomic animal model, the initial genetic precision was set directly to
-%
-\[
-\tau_{a,\mathrm{init}} = \frac{1}{V_A}.
-\]
-%
-In all models, this literature-based value was used only as an initial value. The genetic precision was assigned a penalized-complexity prior, allowing the posterior estimate of the genetic variance to be determined by the data.
+% In the BPCRR models, the additive genetic component was represented using the first $K$ principal components of the SNP matrix,
+% %
+% \[
+% \mathbf{a} = \mathbf{Z}_K^\star \boldsymbol{u}^\star ,
+% \]
+% %
+% where $\mathbf{Z}_K^\star$ contains the first $K$ principal components and $\boldsymbol{u}^\star$ denotes the corresponding vector of PC effects. The value of $K$ therefore controlled the dimension of the genetic component included in the model. The PC effects were assigned a common precision parameter, corresponding to a ridge-type shrinkage of the estimated effects.
+
+% In the genomic animal model, the additive genetic component was instead represented through the genomic relationship matrix. In this formulation, the breeding values were modelled as
+% %
+% \[
+% \mathbf{a} \sim N(\mathbf{0}, \sigma_a^2 \mathbf{G}) ,
+% \]
+% %
+% where $\mathbf{G}$ is the genomic relationship matrix and $\sigma_a^2$ is the additive genetic variance. In contrast to the BPCRR representation, this model does not include the marker-derived PCs as predictors directly. Instead, the marker information enters through the covariance structure of the breeding values, such that genetically similar individuals are expected to have more similar additive genetic effects.
+
+% For both the BPCRR and genomic animal models, the genetic variance component was estimated from the data. A previous dispersal estimate from the same study population, $V_A = 0.448$ \parencite{saatoglu_genetic_2024}, was used to initialize the genetic precision parameter in INLA. For the BPCRR models, this value was first transformed to the PC-effect variance scale as
+% %
+% \[
+% \sigma^2_{u,\mathrm{init}} =
+% \frac{V_A}{\sum_{k=1}^K \mathrm{Var}(\mathbf{Z}_k^\star)} ,
+% \]
+% %
+% giving the corresponding initial precision
+% %
+% \[
+% \tau_{u,\mathrm{init}} =
+% \frac{1}{\sigma^2_{u,\mathrm{init}}}.
+% \]
+% %
+% For the genomic animal model, the initial genetic precision was set directly to
+% %
+% \[
+% \tau_{a,\mathrm{init}} = \frac{1}{V_A}.
+% \]
+% %
+% In all models, this literature-based value was used only as an initial value. The genetic precision was assigned a penalized-complexity prior, allowing the posterior estimate of the genetic variance to be determined by the data.
 
 \subsection{Selection of the number of principal components}
 
-For the BPCRR models, the number of principal components included in the genetic component had to be selected before the final model comparisons were carried out. The value of $K$ determines the dimension of the PC-based genetic component,
-\[
-\mathbf{a} = \mathbf{Z}_K^\star \boldsymbol{u}^\star,
-\]
+For the BPCRR models, the number of principal components included in the genetic component had to be selected before the final model comparisons were carried out. The value of $K$ determines the dimension of the PC-based genetic component, $\mathbf{a}^\star$ from equation \eqref{eq:PC_representation}, 
+%
+%= \mathbf{Z}_K^\star \boldsymbol{u}^\star,
+%
 and therefore controls how much genomic variation is retained in the model.
 
-For the main dispersal trait, the binomial and Gaussian BPCRR models were fitted across the grid
+For the main dispersal trait, the binomial and linear BPCRR models were fitted across the grid
 \[
 K \in \{100, 200, \dots, 1500\}.
 \]
@@ -665,32 +715,30 @@ For the autumn dispersal trait, which was included only for analyses related to 
 K \in \{100, 150, 200, 250\}.
 \]
 %
-For each value of $K$, model performance was evaluated across $10$ replicates. In each replicate, an $80/20$ stratified train-test split was generated, preserving the proportion of dispersers and non-dispersers in both sets. Predictive performance was assessed on the test set using PR-AUC. The selected number of principal components was defined as the value of $K$ that gave the highest median PR-AUC across the $10$ replicates.
+For each value of $K$, model performance was evaluated across $10$ replicates. The selected number of principal components was defined as the value of $K$ that gave the highest median PR-AUC across the $10$ replicates.
 
-\subsection{Model Comparison for the Main Dispersal Trait}
+\subsection{Model Comparison for the Dispersal Trait}
 
 Model comparison for the main dispersal trait was performed using the reduced dispersal dataset, where the $115$ individuals that had dispersed into the Helgeland system from outside the study system were excluded. This ensured that model performance was evaluated for the within-system dispersal phenotype.
 
-The aim of this comparison was to evaluate how the BPCRR models performed relative to the corresponding genomic animal models, and to assess the effect of using a binomial rather than a Gaussian observation model for the binary dispersal response. Four models were therefore compared: the binomial BPCRR model, the Gaussian BPCRR model, the binomial genomic animal model, and the Gaussian genomic animal model.
+The aim of this comparison was to evaluate how the BPCRR models performed relative to the corresponding genomic animal models, and to assess the effect of using a binomial rather than a linear observation model for the binary dispersal response. Four models were therefore compared: the binomial BPCRR model, the linear BPCRR model, the binomial genomic animal model, and the linear genomic animal model.
 
 Predictive performance was evaluated on the observed response scale using PR-AUC. For the BPCRR models, the number of principal components was fixed to the value selected in the previous step. The genomic animal models used the same fixed effects, random effects, and observation models as the BPCRR models, but represented the additive genetic component through the genomic relationship matrix rather than through principal components.
 
 In addition to predictive performance, model runtime was recorded to compare the computational cost of the BPCRR and genomic animal model formulations.
-For each model, performance was evaluated across $10$ repeated stratified $80/20$ train-test splits. In each replicate, the model was fitted using the training set, and predictions were evaluated on the corresponding test set. The same train-test splits were used across models to allow direct comparison of predictive performance.
 
-\subsection{Agreement Between Binomial and Gaussian BPCRR Models}
 
-In addition to comparing predictive performance, the binomial and Gaussian BPCRR models were evaluated with respect to their agreement in ranking individuals. This comparison was performed for the main dispersal trait using the reduced dispersal dataset. Since the two models produce estimated quantities on different scales, direct comparison of absolute values was not the main focus. Instead, agreement was assessed using Spearman rank correlation.
+In addition to comparing predictive performance, the binomial and Gaussian BPCRR models were evaluated with respect to their agreement in ranking individuals. This comparison was performed for the dispersal trait using the reduced dispersal dataset. Since the two models produce estimated quantities on different scales, direct comparison of absolute values was not the main focus. Instead, agreement was assessed using Spearman rank correlation.
 
-Rank correlations were computed between estimated breeding values from the binomial and Gaussian BPCRR models. In addition, the ranking of individuals based on estimated dispersal probabilities from the binomial model was compared with the ranking based on predicted scores from the linear model. This made it possible to assess whether the two observation models identified similar individuals as having relatively high or low genetic propensity for dispersal, and whether they produced similar rankings on the observed response scale.
+Rank correlations were computed between estimated breeding values from the binomial and linear BPCRR models. In addition, the ranking of individuals based on estimated dispersal probabilities from the binomial model was compared with the ranking based on predicted scores from the linear model. This made it possible to assess whether the two observation models identified similar individuals as having relatively high or low genetic propensity for dispersal, and whether they produced similar rankings on the observed response scale.
 
 \subsection{Evaluation of Breeding Values for Downstream Analyses}
 
-Since the estimated breeding values were intended for downstream analyses, their ability to predict dispersal was evaluated separately from the model-comparison analyses described above. The aim of this evaluation was not to assess the full predictive performance of each fitted observation model, but to assess whether the estimated breeding values themselves carried information about dispersal.
+Since the estimated BPCRR breeding values were intended for downstream analyses, their ability to predict dispersal was evaluated separately from the model-comparison analyses described above. The aim of this evaluation was not to assess the full predictive performance of each fitted observation model, but to assess whether the estimated breeding values themselves carried information about dispersal both with the binary model and linear approximation model.
 
 This was evaluated using a 10-fold cross-validation procedure. For each fold, the model was fitted using individuals in the remaining nine folds, and breeding values were predicted for individuals in the held-out fold. Predictive performance was then assessed by computing PR-AUC using the estimated breeding values as prediction scores. Thus, in contrast to the previous model comparisons, PR-AUC was computed from the breeding values rather than from the estimated dispersal probabilities or Gaussian prediction scores.
 
-This analysis was performed for both the main dispersal trait and the autumn dispersal trait. For the main dispersal trait, the full dispersal dataset was used, including the individuals that were excluded from the model-comparison analyses. For the autumn dispersal trait, the analysis was performed using the autumn dispersal dataset, where breeding values were predicted for individuals with available genomic information and evaluated using the individuals with observed autumn dispersal status.
+This analysis was performed for both the dispersal trait and the autumn dispersal trait. For the dispersal trait, the full dispersal dataset was used, including the individuals that were excluded from the model-comparison analyses. For the autumn dispersal trait, the analysis was performed using the autumn dispersal dataset.
 
 % how to select PCs -> pr-auc maybe formula later  
     % grids we tested for both datasets 
